@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:my_coffee_shop/BoldText.dart';
-
+import 'package:my_coffee_shop/DetailPage.dart';
 import 'LightText.dart';
 
 class Tile extends StatelessWidget {
@@ -9,35 +9,46 @@ class Tile extends StatelessWidget {
 
   const Tile({super.key, required this.names});
 
-  // ===========================================================================
-  // DATA LISTS (CUSTOMIZE ITEMS PER COFFEE)
-  // ===========================================================================
-
-  // 📸 CHANGE IMAGES HERE (Must match names list order)
   final List<String> coffeeImages = const [
-    "assets/Cappacuino.png", // Image for Cappucino
-    "assets/latte-coffee-cup.jpg", // Image for Latte (Replace with your asset path)
-    "assets/Espresso.jpg", // Image for Espresso
-    "assets/Americano.jfif", // Image for Americano
-    "assets/Mocha.jfif", // Image for Mocha
+    "assets/Cappacuino.png",
+    "assets/latte-coffee-cup.jpg",
+    "assets/Espresso.jpg",
+    "assets/Americano.jfif",
+    "assets/Mocha.jfif",
   ];
 
-  // 💵 CHANGE PRICES HERE
+  // ☕ REAL SUBTITLES PER COFFEE
+  final List<String> coffeeSubtitles = const [
+    "With Steamed Milk",
+    "With Creamy Foam",
+    "Pure Double Shot",
+    "Hot Water & Espresso",
+    "With Dark Chocolate",
+  ];
+
+  // 📖 REAL DESCRIPTIONS PER COFFEE
+  final List<String> coffeeDescriptions = const [
+    "A cappuccino is an Italian coffee drink that is traditionally prepared with equal parts double espresso, steamed milk, and steamed milk foam on top.",
+    "A latte is a classic espresso-based drink made with one or two shots of espresso, plenty of steamed milk, and a thin layer of light microfoam on top.",
+    "Espresso is a concentrated form of coffee served in small, strong shots. It is brewed by forcing hot water under high pressure through finely-ground coffee beans.",
+    "An Caffe Americano is prepared by diluting an espresso shot with hot water, giving it a similar strength to, but different flavor from, traditionally brewed coffee.",
+    "A caffe mocha is a chocolate-flavored variant of a latte. Made with espresso, hot milk, and sweet dark chocolate syrup topped with velvety milk foam."
+  ];
+
   final List<String> coffeePrices = const [
-    "4.20", // Price for Cappucino
-    "3.80", // Price for Latte
-    "2.50", // Price for Espresso
-    "3.00", // Price for Americano
-    "4.50", // Price for Mocha
+    "4.20",
+    "3.80",
+    "2.50",
+    "3.00",
+    "4.50",
   ];
 
-  // ⭐ CHANGE RATINGS HERE
   final List<String> coffeeRatings = const [
-    "4.5", // Rating for Cappucino
-    "4.2", // Rating for Latte
-    "4.8", // Rating for Espresso
-    "4.0", // Rating for Americano
-    "4.7", // Rating for Mocha
+    "4.5",
+    "4.2",
+    "4.8",
+    "4.0",
+    "4.7",
   ];
 
   @override
@@ -49,126 +60,141 @@ class Tile extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: names.length,
         itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.only(right: 15),
-            height: 250,
-            width: 150,
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 51, 48, 48),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Stack(
-                    children: [
-                      // Coffee Image
-                      Container(
-                        height: 160,
-                        width: 140,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            // 📸 IMAGE PATH IS DYNAMICALLY LOADED HERE
-                            image: AssetImage(coffeeImages[index]),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-
-                      // Rating Tag
-                      Container(
-                        margin: const EdgeInsets.only(left: 80),
-                        height: 20,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.6),
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: Colors.orange,
-                              size: 12,
-                            ),
-                            const SizedBox(width: 3),
-                            // ⭐ RATING TEXT IS DYNAMICALLY LOADED HERE
-                            BoldText(
-                              text: coffeeRatings[index],
-                              size: 12,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailsPage(
+                    title: names[index],
+                    subtitle: coffeeSubtitles[index],
+                    description: coffeeDescriptions[index],
+                    imagePath: coffeeImages[index],
+                    rating: coffeeRatings[index],
+                    price: coffeePrices[index],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 170, left: 10, right: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BoldText(
-                        text: names[index],
-                        size: 16,
-                        color: Colors.white,
-                      ),
-                      LightText(
-                        text: "With Oat Milk",
-                        size: 12,
-                        color: const Color.fromARGB(
-                          255,
-                          205,
-                          199,
-                          199,
-                        ).withValues(alpha: 0.5),
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(right: 15),
+              height: 250,
+              width: 150,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 51, 48, 48),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 160,
+                          width: 140,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(coffeeImages[index]),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(left: 80),
+                          height: 20,
+                          width: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(20),
+                              bottomLeft: Radius.circular(20),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              BoldText(
-                                text: "\$",
-                                size: 16,
+                              const Icon(
+                                Icons.star,
                                 color: Colors.orange,
+                                size: 12,
                               ),
-                              const SizedBox(width: 2),
-                              // 💵 PRICE TEXT IS DYNAMICALLY LOADED HERE
+                              const SizedBox(width: 3),
                               BoldText(
-                                text: coffeePrices[index],
-                                size: 16,
+                                text: coffeeRatings[index],
+                                size: 12,
                                 color: Colors.white,
                               ),
                             ],
                           ),
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 170,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BoldText(
+                          text: names[index],
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                        LightText(
+                          text: coffeeSubtitles[index],
+                          size: 12,
+                          color: const Color.fromARGB(
+                            255,
+                            205,
+                            199,
+                            199,
+                          ).withValues(alpha: 0.5),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                BoldText(
+                                  text: "\$",
+                                  size: 16,
+                                  color: Colors.orange,
+                                ),
+                                const SizedBox(width: 2),
+                                BoldText(
+                                  text: coffeePrices[index],
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: Colors.orange,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },

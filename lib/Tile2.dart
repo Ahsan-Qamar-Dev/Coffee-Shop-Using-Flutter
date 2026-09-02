@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:my_coffee_shop/BoldText.dart';
+import 'package:my_coffee_shop/DetailPage.dart';
 import 'package:my_coffee_shop/LightText.dart';
 
 class Tile2 extends StatelessWidget {
@@ -9,43 +10,32 @@ class Tile2 extends StatelessWidget {
   const Tile2({super.key, required this.names});
 
   // ===========================================================================
-  // DATA LISTS (CUSTOMIZE ITEMS FOR "SPECIAL FOR YOU")
+  // CURATED SPECIAL CARDS / ARTICLES
   // ===========================================================================
 
-  // 📸 CHANGE IMAGES HERE
-  final List<String> specialImages = const [
-    "assets/Cappacuino.png", // Image for Cappucino
-    "assets/latte-coffee-cup.jpg", // Image for Latte
-    "assets/Espresso.jpg", // Image for Espresso
-    "assets/Americano.jfif", // Image for Americano
-    "assets/Mocha.jfif", // Image for Mocha
+  final List<String> promoImages = const [
+    "assets/Cappacuino.png",
+    "assets/Espresso.jpg",
   ];
 
-  // 📝 CHANGE TITLES HERE
-  final List<String> specialTitles = const [
-    "5 Coffee Beans You\n Must Try!",
-    "Creamy Latte\n Perfect Brew!",
-    "Dark Espresso\n Energy Booster!",
-    "Classic Americano\n Pure Taste!",
-    "Rich Chocolate\n Mocha Special!",
+  final List<String> promoTitles = const [
+    "5 Coffee Beans You Must Try!",
+    "Best Way to Brew Dark Espresso",
   ];
 
-  // 💬 CHANGE SUBTITLES HERE
-  final List<String> specialSubtitles = const [
-    "Rich & aromatic blend",
-    "Smooth & velvety foam",
-    "Strong double shot",
-    "Hot water & espresso",
-    "Espresso with cocoa",
+  final List<String> promoSubtitles = const [
+    "Hand-picked beans for top flavor",
+    "Barista tips for maximum crema",
   ];
 
-  // 💵 CHANGE PRICES HERE
-  final List<String> specialPrices = const [
-    "4.20", // Price 1
-    "5.10", // Price 2
-    "3.90", // Price 3
-    "4.75", // Price 4
-    "6.00", // Price 5
+  final List<String> promoDescriptions = const [
+    "Discover 5 premium coffee beans hand-picked for exceptional aroma, smooth finish, and balanced roast profile.",
+    "Master the art of grinding, tamping, and extracting rich dark espresso right from your home machine.",
+  ];
+
+  final List<String> promoPrices = const [
+    "10.50",
+    "8.20",
   ];
 
   @override
@@ -54,92 +44,84 @@ class Tile2 extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
-      itemCount: names.length,
+      itemCount: promoTitles.length,
       itemBuilder: (context, index) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 15),
-          height: 150,
-          width: double.maxFinite,
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 51, 48, 48),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Coffee Image Container
-                Container(
-                  height: 125,
-                  width: 120,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-           
-                      image: AssetImage(specialImages[index]),
-                      fit: BoxFit.cover,
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailsPage(
+                  title: promoTitles[index],
+                  subtitle: promoSubtitles[index],
+                  description: promoDescriptions[index],
+                  imagePath: promoImages[index],
+                  rating: "4.9",
+                  price: promoPrices[index],
+                ),
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 15),
+            height: 130,
+            width: double.maxFinite,
+            decoration: BoxDecoration(
+              color: const Color(0xFF252525),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  // Promo Image
+                  Container(
+                    height: 105,
+                    width: 105,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(promoImages[index]),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    borderRadius: BorderRadius.circular(20),
                   ),
-                ),
-                const SizedBox(width: 15),
+                  const SizedBox(width: 15),
 
-                // Right Side: Title + Subtitle + Price
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 📝 TITLE LOADED DYNAMICALLY
-                      BoldText(
-                        text: specialTitles[index],
-                        size: 15,
-                        color: Colors.white,
-                      ),
-                      // 💬 SUBTITLE LOADED DYNAMICALLY
-                      LightText(
-                        text: specialSubtitles[index],
-                        size: 11,
-                        color: Colors.grey,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              BoldText(
-                                text: "\$",
-                                size: 16,
-                                color: Colors.orange,
-                              ),
-                              const SizedBox(width: 2),
-                              // 💵 PRICE LOADED DYNAMICALLY
-                              BoldText(
-                                text: specialPrices[index],
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                            ],
-                          ),
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.add,
+                  // Text Info
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BoldText(
+                          text: promoTitles[index],
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(height: 6),
+                        LightText(
+                          text: promoSubtitles[index],
+                          size: 11,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            BoldText(text: "\$", size: 14, color: Colors.orange),
+                            const SizedBox(width: 2),
+                            BoldText(
+                              text: promoPrices[index],
+                              size: 14,
                               color: Colors.white,
-                              size: 16,
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
