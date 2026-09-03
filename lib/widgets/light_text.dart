@@ -1,31 +1,33 @@
-// ignore_for_file: file_names, prefer_const_constructors_in_immutables
-
 import 'package:flutter/material.dart';
 
 class LightText extends StatelessWidget {
   final double size;
   final String text;
   final String font;
-  final Color color;
+  final Color? color;
   final TextOverflow textOverflow;
 
-  LightText({
+  const LightText({
     super.key,
     this.textOverflow = TextOverflow.ellipsis,
     this.font = "font30",
     this.size = 20,
-    this.color = Colors.white,
+    this.color,
     required this.text,
   });
 
   @override
   Widget build(BuildContext context) {
+    final defaultColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey
+        : Colors.grey.shade700;
+
     return Text(
       text,
       overflow: textOverflow,
       style: TextStyle(
         fontSize: size,
-        color: color,
+        color: color ?? defaultColor,
         fontFamily: font,
       ),
     );

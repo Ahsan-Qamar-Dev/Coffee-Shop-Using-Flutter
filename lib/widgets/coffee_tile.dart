@@ -1,78 +1,56 @@
-// ignore_for_file: file_names
 import 'package:flutter/material.dart';
-import 'package:my_coffee_shop/BoldText.dart';
-import 'package:my_coffee_shop/DetailPage.dart';
-import 'LightText.dart';
+import 'package:provider/provider.dart';
+import 'package:my_coffee_shop/models/coffee_model.dart';
+import 'package:my_coffee_shop/providers/cart_provider.dart';
+import 'package:my_coffee_shop/views/detail_page.dart';
+import 'package:my_coffee_shop/widgets/bold_text.dart';
+import 'package:my_coffee_shop/widgets/light_text.dart';
 
 class Tile extends StatelessWidget {
-  final List<String> names;
+  final List<Coffee> coffees;
 
-  const Tile({super.key, required this.names});
-
-  final List<String> coffeeImages = const [
-    "assets/Cappacuino.png",
-    "assets/latte-coffee-cup.jpg",
-    "assets/Espresso.jpg",
-    "assets/Americano.jfif",
-    "assets/Mocha.jfif",
-  ];
-
-  // ☕ REAL SUBTITLES PER COFFEE
-  final List<String> coffeeSubtitles = const [
-    "With Steamed Milk",
-    "With Creamy Foam",
-    "Pure Double Shot",
-    "Hot Water & Espresso",
-    "With Dark Chocolate",
-  ];
-
-  // 📖 REAL DESCRIPTIONS PER COFFEE
-  final List<String> coffeeDescriptions = const [
-    "A cappuccino is an Italian coffee drink that is traditionally prepared with equal parts double espresso, steamed milk, and steamed milk foam on top.",
-    "A latte is a classic espresso-based drink made with one or two shots of espresso, plenty of steamed milk, and a thin layer of light microfoam on top.",
-    "Espresso is a concentrated form of coffee served in small, strong shots. It is brewed by forcing hot water under high pressure through finely-ground coffee beans.",
-    "An Caffe Americano is prepared by diluting an espresso shot with hot water, giving it a similar strength to, but different flavor from, traditionally brewed coffee.",
-    "A caffe mocha is a chocolate-flavored variant of a latte. Made with espresso, hot milk, and sweet dark chocolate syrup topped with velvety milk foam."
-  ];
-
-  final List<String> coffeePrices = const [
-    "4.20",
-    "3.80",
-    "2.50",
-    "3.00",
-    "4.50",
-  ];
-
-  final List<String> coffeeRatings = const [
-    "4.5",
-    "4.2",
-    "4.8",
-    "4.0",
-    "4.7",
-  ];
+  const Tile({super.key, required this.coffees});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF1E222A) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black87;
+
+    if (coffees.isEmpty) {
+      return SizedBox(
+        height: 200,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.search_off, color: Colors.grey, size: 40),
+              const SizedBox(height: 8),
+              LightText(
+                text: "No coffee found matching your search",
+                size: 14,
+                color: Colors.grey,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return SizedBox(
       width: double.maxFinite,
       height: 260,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: names.length,
+        itemCount: coffees.length,
         itemBuilder: (context, index) {
+          final coffee = coffees[index];
           return GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DetailsPage(
-                    title: names[index],
-                    subtitle: coffeeSubtitles[index],
-                    description: coffeeDescriptions[index],
-                    imagePath: coffeeImages[index],
-                    rating: coffeeRatings[index],
-                    price: coffeePrices[index],
-                  ),
+                  builder: (context) => DetailsPage(coffee: coffee),
                 ),
               );
             },
@@ -81,8 +59,17 @@ class Tile extends StatelessWidget {
               height: 250,
               width: 150,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 51, 48, 48),
+                color: cardColor,
                 borderRadius: BorderRadius.circular(20),
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.grey.withValues(alpha: 0.15),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
               ),
               child: Stack(
                 children: [
@@ -95,7 +82,7 @@ class Tile extends StatelessWidget {
                           width: 140,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage(coffeeImages[index]),
+                              image: AssetImage(coffee.imagePath),
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(20),
@@ -122,7 +109,7 @@ class Tile extends StatelessWidget {
                               ),
                               const SizedBox(width: 3),
                               BoldText(
-                                text: coffeeRatings[index],
+                                text: coffee.rating.toString(),
                                 size: 12,
                                 color: Colors.white,
                               ),
@@ -142,19 +129,14 @@ class Tile extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         BoldText(
-                          text: names[index],
+                          text: coffee.name,
                           size: 16,
-                          color: Colors.white,
+                          color: textColor,
                         ),
                         LightText(
-                          text: coffeeSubtitles[index],
+                          text: coffee.subtitle,
                           size: 12,
-                          color: const Color.fromARGB(
-                            255,
-                            205,
-                            199,
-                            199,
-                          ).withValues(alpha: 0.5),
+                          color: Colors.grey,
                         ),
                         const SizedBox(height: 2),
                         Row(
@@ -169,23 +151,40 @@ class Tile extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 2),
                                 BoldText(
-                                  text: coffeePrices[index],
+                                  text: coffee.price.toStringAsFixed(2),
                                   size: 16,
-                                  color: Colors.white,
+                                  color: textColor,
                                 ),
                               ],
                             ),
-                            Container(
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color: Colors.orange,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 16,
+                            GestureDetector(
+                              onTap: () {
+                                context.read<CartProvider>().addItem(coffee, 'M');
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: const Color(0xFFD97736),
+                                    behavior: SnackBarBehavior.floating,
+                                    content: Text(
+                                      'Added ${coffee.name} (M) to Cart!',
+                                      style: const TextStyle(color: Colors.white),
+                                    ),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: Colors.orange,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
                               ),
                             ),
                           ],

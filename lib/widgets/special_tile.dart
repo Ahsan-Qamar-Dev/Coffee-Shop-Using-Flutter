@@ -1,64 +1,33 @@
-// ignore_for_file: file_names
 import 'package:flutter/material.dart';
-import 'package:my_coffee_shop/BoldText.dart';
-import 'package:my_coffee_shop/DetailPage.dart';
-import 'package:my_coffee_shop/LightText.dart';
+import 'package:my_coffee_shop/models/coffee_model.dart';
+import 'package:my_coffee_shop/views/detail_page.dart';
+import 'package:my_coffee_shop/widgets/bold_text.dart';
+import 'package:my_coffee_shop/widgets/light_text.dart';
 
 class Tile2 extends StatelessWidget {
-  final List<String> names;
+  final List<Coffee> specials;
 
-  const Tile2({super.key, required this.names});
-
-  // ===========================================================================
-  // CURATED SPECIAL CARDS / ARTICLES
-  // ===========================================================================
-
-  final List<String> promoImages = const [
-    "assets/Cappacuino.png",
-    "assets/Espresso.jpg",
-  ];
-
-  final List<String> promoTitles = const [
-    "5 Coffee Beans You Must Try!",
-    "Best Way to Brew Dark Espresso",
-  ];
-
-  final List<String> promoSubtitles = const [
-    "Hand-picked beans for top flavor",
-    "Barista tips for maximum crema",
-  ];
-
-  final List<String> promoDescriptions = const [
-    "Discover 5 premium coffee beans hand-picked for exceptional aroma, smooth finish, and balanced roast profile.",
-    "Master the art of grinding, tamping, and extracting rich dark espresso right from your home machine.",
-  ];
-
-  final List<String> promoPrices = const [
-    "10.50",
-    "8.20",
-  ];
+  const Tile2({super.key, required this.specials});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF252525) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black87;
+
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
-      itemCount: promoTitles.length,
+      itemCount: specials.length,
       itemBuilder: (context, index) {
+        final coffee = specials[index];
         return GestureDetector(
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DetailsPage(
-                  title: promoTitles[index],
-                  subtitle: promoSubtitles[index],
-                  description: promoDescriptions[index],
-                  imagePath: promoImages[index],
-                  rating: "4.9",
-                  price: promoPrices[index],
-                ),
+                builder: (context) => DetailsPage(coffee: coffee),
               ),
             );
           },
@@ -67,8 +36,17 @@ class Tile2 extends StatelessWidget {
             height: 130,
             width: double.maxFinite,
             decoration: BoxDecoration(
-              color: const Color(0xFF252525),
+              color: cardColor,
               borderRadius: BorderRadius.circular(20),
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.grey.withValues(alpha: 0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
             ),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -80,7 +58,7 @@ class Tile2 extends StatelessWidget {
                     width: 105,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(promoImages[index]),
+                        image: AssetImage(coffee.imagePath),
                         fit: BoxFit.cover,
                       ),
                       borderRadius: BorderRadius.circular(16),
@@ -95,13 +73,13 @@ class Tile2 extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         BoldText(
-                          text: promoTitles[index],
-                          size: 14,
-                          color: Colors.white,
+                          text: coffee.name,
+                          size: 15,
+                          color: textColor,
                         ),
                         const SizedBox(height: 6),
                         LightText(
-                          text: promoSubtitles[index],
+                          text: coffee.subtitle,
                           size: 11,
                           color: Colors.grey,
                         ),
@@ -111,9 +89,9 @@ class Tile2 extends StatelessWidget {
                             BoldText(text: "\$", size: 14, color: Colors.orange),
                             const SizedBox(width: 2),
                             BoldText(
-                              text: promoPrices[index],
+                              text: coffee.price.toStringAsFixed(2),
                               size: 14,
-                              color: Colors.white,
+                              color: textColor,
                             ),
                           ],
                         ),

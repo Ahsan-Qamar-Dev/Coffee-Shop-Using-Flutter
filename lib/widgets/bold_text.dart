@@ -1,5 +1,3 @@
-
-// ignore_for_file: file_names, prefer_const_constructors_in_immutables
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,7 +9,7 @@ class BoldText extends StatelessWidget {
   final TextAlign? align;
   final TextOverflow textOverflow;
 
-  BoldText({
+  const BoldText({
     super.key,
     this.size = 20,
     this.align,
@@ -23,6 +21,10 @@ class BoldText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaultColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black87;
+
     return Text(
       text,
       overflow: textOverflow,
@@ -30,7 +32,7 @@ class BoldText extends StatelessWidget {
       style: GoogleFonts.poppins(
         fontWeight: FontWeight.bold,
         fontSize: size,
-        color: color,
+        color: color ?? defaultColor,
       ),
     );
   }

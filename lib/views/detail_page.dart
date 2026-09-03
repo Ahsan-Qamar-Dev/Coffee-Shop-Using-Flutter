@@ -1,24 +1,17 @@
-// ignore_for_file: file_names
 import 'package:flutter/material.dart';
-import 'package:my_coffee_shop/BoldText.dart';
-import 'package:my_coffee_shop/LightText.dart';
+import 'package:provider/provider.dart';
+import 'package:my_coffee_shop/models/coffee_model.dart';
+import 'package:my_coffee_shop/providers/cart_provider.dart';
+import 'package:my_coffee_shop/providers/favorite_provider.dart';
+import 'package:my_coffee_shop/widgets/bold_text.dart';
+import 'package:my_coffee_shop/widgets/light_text.dart';
 
 class DetailsPage extends StatefulWidget {
-  final String title;
-  final String subtitle;
-  final String description;
-  final String imagePath;
-  final String rating;
-  final String price;
+  final Coffee coffee;
 
   const DetailsPage({
     super.key,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-    required this.imagePath,
-    required this.rating,
-    required this.price,
+    required this.coffee,
   });
 
   @override
@@ -26,13 +19,12 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-  bool isFavorite = false;
   int selectedSizeIndex = 0;
 
   final List<String> sizes = const ["S", "M", "L"];
 
   String get dynamicPrice {
-    double basePrice = double.tryParse(widget.price) ?? 4.20;
+    double basePrice = widget.coffee.price;
     if (selectedSizeIndex == 1) {
       basePrice += 0.50;
     } else if (selectedSizeIndex == 2) {
@@ -43,8 +35,13 @@ class _DetailsPageState extends State<DetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final chipColor = isDark ? const Color(0xFF252525) : Colors.grey.shade200;
+    final textColor = isDark ? Colors.white : Colors.black87;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +58,7 @@ class _DetailsPageState extends State<DetailsPage> {
                       bottomRight: Radius.circular(30),
                     ),
                     image: DecorationImage(
-                      image: AssetImage(widget.imagePath),
+                      image: AssetImage(widget.coffee.imagePath),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -88,26 +85,42 @@ class _DetailsPageState extends State<DetailsPage> {
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isFavorite = !isFavorite;
-                            });
+                        Consumer<FavoriteProvider>(
+                          builder: (context, favProvider, child) {
+                            final isFav = favProvider.isFavorite(widget.coffee);
+                            return GestureDetector(
+                              onTap: () {
+                                favProvider.toggleFavorite(widget.coffee);
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: isFav
+                                        ? Colors.grey.shade800
+                                        : Colors.red.shade800,
+                                    behavior: SnackBarBehavior.floating,
+                                    content: Text(
+                                      isFav
+                                          ? 'Removed ${widget.coffee.name} from Favorites'
+                                          : 'Added ${widget.coffee.name} to Favorites ❤️',
+                                    ),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.5),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  isFav ? Icons.favorite : Icons.favorite_border,
+                                  color: isFav ? Colors.red : Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                            );
                           },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: isFavorite ? Colors.red : Colors.white,
-                              size: 20,
-                            ),
-                          ),
                         ),
                       ],
                     ),
@@ -127,20 +140,19 @@ class _DetailsPageState extends State<DetailsPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // 🛠️ PREVENT HORIZONTAL OVERFLOW
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               BoldText(
-                                text: widget.title.replaceAll('\n', ' '),
+                                text: widget.coffee.name,
                                 size: 18,
                                 color: Colors.white,
                               ),
                               const SizedBox(height: 5),
                               LightText(
-                                text: widget.subtitle,
+                                text: widget.coffee.subtitle,
                                 size: 12,
                                 color: Colors.grey,
                               ),
@@ -154,7 +166,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                   ),
                                   const SizedBox(width: 4),
                                   BoldText(
-                                    text: widget.rating,
+                                    text: widget.coffee.rating.toString(),
                                     size: 14,
                                     color: Colors.white,
                                   ),
@@ -193,23 +205,23 @@ class _DetailsPageState extends State<DetailsPage> {
                   BoldText(
                     text: "Description",
                     size: 16,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    widget.description.replaceAll('\n', ' '),
+                    widget.coffee.description,
                     softWrap: true,
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.5,
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: isDark ? Colors.white70 : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 20),
                   BoldText(
                     text: "Size",
                     size: 16,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -220,6 +232,8 @@ class _DetailsPageState extends State<DetailsPage> {
                         sizes[index],
                         index: index,
                         isSelected: selectedSizeIndex == index,
+                        chipColor: chipColor,
+                        textColor: textColor,
                       ),
                     ),
                   ),
@@ -232,7 +246,7 @@ class _DetailsPageState extends State<DetailsPage> {
       bottomNavigationBar: Container(
         height: 90,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        color: const Color(0xFF1E1E1E),
+        color: cardColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -248,14 +262,40 @@ class _DetailsPageState extends State<DetailsPage> {
                     BoldText(
                       text: dynamicPrice,
                       size: 20,
-                      color: Colors.white,
+                      color: textColor,
                     ),
                   ],
                 ),
               ],
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                final selectedSize = sizes[selectedSizeIndex];
+                context.read<CartProvider>().addItem(widget.coffee, selectedSize);
+
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: const Color(0xFFD97736),
+                    behavior: SnackBarBehavior.floating,
+                    content: Row(
+                      children: [
+                        const Icon(Icons.check_circle, color: Colors.white),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Added ${widget.coffee.name} ($selectedSize) to Cart!',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 padding:
@@ -293,8 +333,13 @@ class _DetailsPageState extends State<DetailsPage> {
     );
   }
 
-  Widget _buildSizeChip(String size,
-      {required int index, required bool isSelected}) {
+  Widget _buildSizeChip(
+    String size, {
+    required int index,
+    required bool isSelected,
+    required Color chipColor,
+    required Color textColor,
+  }) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -305,17 +350,18 @@ class _DetailsPageState extends State<DetailsPage> {
         width: 100,
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF252525),
+          color: isSelected ? Colors.orange.withValues(alpha: 0.2) : chipColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? Colors.orange : Colors.transparent,
+            width: 1.5,
           ),
         ),
         child: Center(
           child: BoldText(
             text: size,
             size: 14,
-            color: isSelected ? Colors.orange : Colors.grey,
+            color: isSelected ? Colors.orange : textColor,
           ),
         ),
       ),
