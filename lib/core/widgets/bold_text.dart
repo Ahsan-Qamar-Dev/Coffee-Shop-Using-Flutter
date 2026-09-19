@@ -13,7 +13,7 @@ class BoldText extends StatelessWidget {
     this.size = 20,
     this.align,
     this.textOverflow = TextOverflow.ellipsis,
-    this.font = "font30",
+    this.font = 'Poppins',
     this.color,
     required this.text,
   });
@@ -29,7 +29,7 @@ class BoldText extends StatelessWidget {
       overflow: textOverflow,
       textAlign: align,
       style: TextStyle(
-        fontFamily: 'Poppins',
+        fontFamily: font,
         fontWeight: FontWeight.bold,
         fontSize: size,
         color: color ?? defaultColor,

@@ -9,6 +9,9 @@ class AuthController extends GetxController {
   bool busy = false;
   String? error;
   AuthUser? user;
+  Future<bool> signInDemo() => _run(() async {
+    user = await repository.signInDemo();
+  });
   Future<bool> _run(Future<void> Function() action) async {
     if (busy) return false;
     busy = true;
@@ -38,6 +41,19 @@ class AuthController extends GetxController {
       });
   Future<bool> resetPassword(String email) =>
       _run(() => repository.requestPasswordReset(email));
+  Future<bool> updateName(String name) => _run(() async {
+    if (user == null) throw const AuthFailure('Please sign in again.');
+    user = await repository.updateName(user!.email, name);
+  });
+  Future<bool> changePassword(String currentPassword, String newPassword) =>
+      _run(() async {
+        if (user == null) throw const AuthFailure('Please sign in again.');
+        await repository.changePassword(
+          user!.email,
+          currentPassword,
+          newPassword,
+        );
+      });
   Future<bool> signOut() => _run(() async {
     await repository.signOut();
     user = null;

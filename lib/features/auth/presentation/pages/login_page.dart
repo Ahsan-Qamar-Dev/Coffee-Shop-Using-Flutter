@@ -77,6 +77,20 @@ class _AuthPageState extends State<AuthPage> {
         .push(MaterialPageRoute(builder: (_) => AuthPage(mode: mode)));
   }
 
+  Future<void> _tryDemo() async {
+    final auth = Get.find<AuthController>();
+    if (auth.busy) return;
+    FocusScope.of(context).unfocus();
+    final ok = await auth.signInDemo();
+    if (!mounted) return;
+    if (!ok) {
+      AppFeedback.show(context, auth.error ?? 'Please try again.', error: true);
+      return;
+    }
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    Get.offAll(() => const HomePage());
+  }
+
   Widget _field({
     required String label,
     required TextEditingController controller,
@@ -314,13 +328,7 @@ class _AuthPageState extends State<AuthPage> {
                           const SizedBox(height: 16),
                           if (widget.mode == AuthPageMode.signIn) ...[
                             OutlinedButton(
-                              onPressed: auth.busy
-                                  ? null
-                                  : () {
-                                      _email.text = 'demo@coffee.test';
-                                      _password.text = 'Coffee123!';
-                                      _submit();
-                                    },
+                              onPressed: auth.busy ? null : _tryDemo,
                               child: const Text('Try demo account'),
                             ),
                             Wrap(

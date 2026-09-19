@@ -6,6 +6,7 @@ class CartController extends GetxController {
   final List<CartItem> _items = [];
 
   List<CartItem> get items => List.unmodifiable(_items);
+  int get totalCents => _items.fold(0, (sum, item) => sum + item.totalCents);
 
   /// Total price of all items in the cart
   double get totalPrice {
@@ -27,6 +28,7 @@ class CartController extends GetxController {
 
   /// Adds a coffee to cart with a specific size ('S', 'M', 'L')
   void addItem(Coffee coffee, String size) {
+    coffee.priceCentsFor(size);
     // Check if an item with the exact same coffee ID and size exists
     final existingIndex = _items.indexWhere(
       (item) => item.coffee.id == coffee.id && item.size == size,
@@ -42,12 +44,14 @@ class CartController extends GetxController {
 
   /// Increments quantity for a specific cart item
   void incrementQuantity(CartItem item) {
+    if (!_items.contains(item)) return;
     item.quantity++;
     update();
   }
 
   /// Decrements quantity; if quantity reaches 0, removes the item
   void decrementQuantity(CartItem item) {
+    if (!_items.contains(item)) return;
     if (item.quantity > 1) {
       item.quantity--;
     } else {

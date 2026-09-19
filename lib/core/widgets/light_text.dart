@@ -10,7 +10,7 @@ class LightText extends StatelessWidget {
   const LightText({
     super.key,
     this.textOverflow = TextOverflow.ellipsis,
-    this.font = "font30",
+    this.font = 'Roboto',
     this.size = 20,
     this.color,
     required this.text,

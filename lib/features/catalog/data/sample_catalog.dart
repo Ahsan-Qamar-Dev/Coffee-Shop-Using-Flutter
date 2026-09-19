@@ -32,7 +32,7 @@ final List<Coffee> sampleCoffees = [
     id: 'c4',
     name: 'Americano',
     subtitle: 'Hot Water & Espresso',
-    description: 'An Caffe Americano is prepared by diluting an espresso shot with hot water, giving it a similar strength to, but different flavor from, traditionally brewed coffee.',
+    description: 'A Caffe Americano is prepared by diluting an espresso shot with hot water, giving it a similar strength to, but different flavor from, traditionally brewed coffee.',
     price: 3.00,
     rating: 4.0,
     imagePath: 'assets/Americano.jfif',

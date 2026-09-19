@@ -1,265 +1,124 @@
-import 'package:my_coffee_shop/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:my_coffee_shop/features/cart/presentation/controllers/cart_controller.dart';
-import 'package:my_coffee_shop/features/favorites/presentation/controllers/favorite_controller.dart';
-import 'package:my_coffee_shop/core/theme/theme_controller.dart';
-import 'package:my_coffee_shop/app/sign_out.dart';
-import 'package:my_coffee_shop/features/profile/presentation/pages/profile_screen.dart';
-import 'package:my_coffee_shop/core/widgets/bold_text.dart';
-import 'package:my_coffee_shop/core/widgets/light_text.dart';
+
+import '../sign_out.dart';
+import '../../core/theme/theme_controller.dart';
+import '../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../features/orders/presentation/pages/order_pages.dart';
+import '../../features/profile/presentation/pages/profile_screen.dart';
+import '../../features/profile/presentation/pages/help_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
-  final Function(int)? onSelectTab;
-
-  const CustomDrawer({super.key, this.onSelectTab});
-
+  const CustomDrawer({super.key, required this.onSelectTab});
+  final ValueChanged<int> onSelectTab;
   @override
-  Widget build(BuildContext context) {
-    return GetBuilder<ThemeController>(
-      builder: (_) {
-        return GetBuilder<CartController>(
-          builder: (_) {
-            return GetBuilder<FavoriteController>(
-              builder: (_) {
-                final themeProvider = Get.find<ThemeController>();
-                final cartProvider = Get.find<CartController>();
-                final favProvider = Get.find<FavoriteController>();
-                final isDark = themeProvider.isDarkMode;
-
-                final bgColor = isDark ? const Color(0xFF1E222A) : Colors.white;
-                final textColor = isDark ? Colors.white : Colors.black87;
-
-                return Drawer(
-                  backgroundColor: bgColor,
-                  child: Column(
-                    children: [
-                      // User Profile Drawer Header
-                      UserAccountsDrawerHeader(
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF14181F)
-                              : Colors.orange.shade800,
-                        ),
-                        currentAccountPicture: CircleAvatar(
-                          radius: 35,
-                          backgroundImage: const AssetImage('assets/Ahsan.png'),
-                        ),
-                        accountName: BoldText(
-                          text:
-                              Get.find<AuthController>().user?.name ??
-                              'Coffee Lover',
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                        accountEmail: LightText(
-                          text:
-                              Get.find<AuthController>().user?.email ??
-                              'Preview account',
-                          size: 13,
-                          color: Colors.white70,
-                        ),
+  Widget build(BuildContext context) => Drawer(
+    child: SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+            child: GetBuilder<AuthController>(
+              builder: (auth) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer,
+                    child: Text(
+                      (auth.user?.name ?? 'C').substring(0, 1).toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
                       ),
-
-                      // Drawer Links List
-                      Expanded(
-                        child: ListView(
-                          padding: EdgeInsets.zero,
-                          children: [
-                            ListTile(
-                              leading: const Icon(
-                                Icons.home,
-                                color: Colors.orange,
-                              ),
-                              title: BoldText(
-                                text: "Home",
-                                size: 15,
-                                color: textColor,
-                              ),
-                              onTap: () {
-                                Navigator.pop(context);
-                                if (onSelectTab != null) onSelectTab!(0);
-                              },
-                            ),
-                            ListTile(
-                              leading: const Icon(
-                                Icons.favorite,
-                                color: Colors.red,
-                              ),
-                              title: BoldText(
-                                text: "Favorites",
-                                size: 15,
-                                color: textColor,
-                              ),
-                              trailing: favProvider.favorites.isNotEmpty
-                                  ? Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Text(
-                                        "${favProvider.favorites.length}",
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    )
-                                  : null,
-                              onTap: () {
-                                Navigator.pop(context);
-                                if (onSelectTab != null) onSelectTab!(1);
-                              },
-                            ),
-                            ListTile(
-                              leading: const Icon(
-                                Icons.shopping_cart,
-                                color: Colors.orange,
-                              ),
-                              title: BoldText(
-                                text: "Cart",
-                                size: 15,
-                                color: textColor,
-                              ),
-                              trailing: cartProvider.itemCount > 0
-                                  ? Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Text(
-                                        "${cartProvider.itemCount}",
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    )
-                                  : null,
-                              onTap: () {
-                                Navigator.pop(context);
-                                if (onSelectTab != null) onSelectTab!(2);
-                              },
-                            ),
-                            ListTile(
-                              leading: const Icon(
-                                Icons.person,
-                                color: Colors.orange,
-                              ),
-                              title: BoldText(
-                                text: "Profile & Settings",
-                                size: 15,
-                                color: textColor,
-                              ),
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ProfileScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            const Divider(),
-
-                            // Dark / Light Mode Switch
-                            SwitchListTile(
-                              secondary: Icon(
-                                isDark ? Icons.dark_mode : Icons.light_mode,
-                                color: isDark
-                                    ? Colors.orange
-                                    : Colors.amber.shade700,
-                              ),
-                              title: BoldText(
-                                text: isDark ? "Dark Mode" : "Light Mode",
-                                size: 15,
-                                color: textColor,
-                              ),
-                              value: isDark,
-                              activeTrackColor: Colors.orange,
-                              onChanged: (value) {
-                                themeProvider.toggleTheme(value);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Logout Button at Bottom
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ListTile(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          tileColor: Colors.red.withValues(alpha: 0.15),
-                          leading: const Icon(Icons.logout, color: Colors.red),
-                          title: BoldText(
-                            text: "Logout",
-                            size: 15,
-                            color: Colors.red,
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            _showLogoutDialog(context);
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E222A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: BoldText(
-          text: "Logout Confirmation",
-          size: 18,
-          color: Colors.white,
-        ),
-        content: LightText(
-          text: "Are you sure you want to logout from My Coffee Shop?",
-          size: 14,
-          color: Colors.grey,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: LightText(text: "Cancel", size: 14, color: Colors.grey),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              signOut(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 16),
+                  Text(
+                    auth.user?.name ?? 'Coffee Lover',
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    auth.user?.email ?? 'Preview account',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: BoldText(text: "Logout", size: 14, color: Colors.white),
+          ),
+          const Divider(),
+          for (final entry in [
+            (Icons.home_outlined, 'Home', 0),
+            (Icons.favorite_border, 'Favorites', 1),
+            (Icons.shopping_bag_outlined, 'Cart', 2),
+            (Icons.notifications_outlined, 'Notifications', 3),
+          ])
+            ListTile(
+              leading: Icon(entry.$1),
+              title: Text(entry.$2),
+              onTap: () {
+                Navigator.pop(context);
+                onSelectTab(entry.$3);
+              },
+            ),
+          ListTile(
+            leading: const Icon(Icons.receipt_long_outlined),
+            title: const Text('My orders'),
+            onTap: () => _open(context, const OrdersScreen()),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: const Text('Profile & settings'),
+            onTap: () => _open(context, const ProfileScreen()),
+          ),
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('Help & about'),
+            onTap: () => _open(context, const HelpScreen()),
+          ),
+          const Divider(),
+          GetBuilder<ThemeController>(
+            builder: (theme) => SwitchListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              secondary: const Icon(Icons.dark_mode_outlined),
+              title: const Text('Dark mode'),
+              value: theme.isDarkMode,
+              onChanged: theme.toggleTheme,
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Sign out'),
+            onTap: () {
+              final navigator = Navigator.of(context);
+              navigator.pop();
+              confirmSignOut(navigator.context);
+            },
+          ),
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'Made for your daily coffee moment.\nUI preview · 1.0',
+              style: TextStyle(fontSize: 12, height: 1.6),
+            ),
           ),
         ],
       ),
-    );
+    ),
+  );
+  void _open(BuildContext context, Widget page) {
+    final navigator = Navigator.of(context);
+    navigator.pop();
+    navigator.push(MaterialPageRoute<void>(builder: (_) => page));
   }
 }

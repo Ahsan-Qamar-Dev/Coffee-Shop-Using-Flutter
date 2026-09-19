@@ -33,6 +33,14 @@ void main() {
     expect(await auth.signIn('demo@coffee.test', 'Coffee123!'), isFalse);
     expect(await first, isTrue);
   });
+  test('demo entry still works after changing its preview password', () async {
+    final auth = AuthController(DemoAuthRepository());
+    expect(await auth.signInDemo(), isTrue);
+    expect(await auth.changePassword('Coffee123!', 'Coffee456!'), isTrue);
+    expect(await auth.signOut(), isTrue);
+    expect(await auth.signInDemo(), isTrue);
+    expect(auth.user?.email, 'demo@coffee.test');
+  });
   test('email and password rules', () {
     expect(AuthValidators.email('person@example.com'), isNull);
     expect(AuthValidators.email('person@'), isNotNull);

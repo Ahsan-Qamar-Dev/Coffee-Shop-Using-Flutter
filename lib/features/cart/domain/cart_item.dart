@@ -7,11 +7,7 @@ class CartItem {
 
   CartItem({required this.coffee, required this.size, this.quantity = 1});
 
-  /// Calculates total price considering size multiplier & quantity
-  double get totalPrice {
-    double sizeExtra = 0.0;
-    if (size == 'M') sizeExtra = 0.50;
-    if (size == 'L') sizeExtra = 1.00;
-    return (coffee.price + sizeExtra) * quantity;
-  }
+  int get unitPriceCents => coffee.priceCentsFor(size);
+  int get totalCents => unitPriceCents * quantity;
+  double get totalPrice => totalCents / 100;
 }

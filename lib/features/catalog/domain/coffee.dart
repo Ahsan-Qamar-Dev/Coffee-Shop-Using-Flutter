@@ -16,4 +16,19 @@ class Coffee {
     required this.rating,
     required this.imagePath,
   });
+
+  int priceCentsFor(String size) {
+    if (!const ['S', 'M', 'L'].contains(size)) {
+      throw ArgumentError.value(size, 'size', 'Choose S, M or L');
+    }
+    return (price * 100).round() +
+        (size == 'M'
+            ? 50
+            : size == 'L'
+            ? 100
+            : 0);
+  }
+
+  bool get containsMilk =>
+      const ['Cappuccino', 'Latte', 'Mocha'].contains(name);
 }

@@ -175,7 +175,7 @@ void main() {
     cart.incrementQuantity(cart.items.first);
     await tester.pumpAndSettle();
     expect(cart.itemCount, 2);
-    expect(find.text('8.40'), findsWidgets);
+    expect(find.text('\$8.40'), findsWidgets);
     cart.clearCart();
     await tester.pumpAndSettle();
     expect(cart.items, isEmpty);
@@ -206,7 +206,7 @@ void main() {
         scale: scale,
       );
       expect(tester.takeException(), isNull);
-      await tester.ensureVisible(find.text('Size'));
+      await tester.scrollUntilVisible(find.text('Size'), 250);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });

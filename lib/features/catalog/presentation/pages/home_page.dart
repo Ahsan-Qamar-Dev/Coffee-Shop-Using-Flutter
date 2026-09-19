@@ -1,320 +1,234 @@
-import 'package:get/get.dart';
-import 'package:my_coffee_shop/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:my_coffee_shop/features/catalog/domain/coffee.dart';
-import 'package:my_coffee_shop/features/catalog/data/sample_catalog.dart';
-import 'package:my_coffee_shop/features/cart/presentation/pages/cart_screen.dart';
-import 'package:my_coffee_shop/features/favorites/presentation/pages/favorite_screen.dart';
-import 'package:my_coffee_shop/features/notifications/presentation/pages/notification_screen.dart';
-import 'package:my_coffee_shop/features/profile/presentation/pages/profile_screen.dart';
-import 'package:my_coffee_shop/core/widgets/bold_text.dart';
-import 'package:my_coffee_shop/features/catalog/presentation/widgets/coffee_tile.dart';
-import 'package:my_coffee_shop/app/widgets/custom_drawer.dart';
-import 'package:my_coffee_shop/features/catalog/presentation/widgets/special_tile.dart';
+import 'package:get/get.dart';
+
+import '../../../../app/shop_navigation.dart';
+import '../../../../app/widgets/custom_drawer.dart';
+import '../../../../core/widgets/shop_widgets.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../cart/presentation/controllers/cart_controller.dart';
+import '../../../cart/presentation/pages/cart_screen.dart';
+import '../../../favorites/presentation/pages/favorite_screen.dart';
+import '../../../notifications/presentation/controllers/notification_controller.dart';
+import '../../../notifications/presentation/pages/notification_screen.dart';
+import '../../../profile/presentation/pages/profile_screen.dart';
+import '../../data/sample_catalog.dart';
+import '../widgets/coffee_tile.dart';
+import '../widgets/special_tile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-  int _selectedCategoryIndex = 0;
-  String _searchQuery = "";
-  final TextEditingController _searchController = TextEditingController();
-
-  final List<String> categories = const [
-    "All",
-    "Cappuccino",
-    "Latte",
-    "Espresso",
-    "Americano",
-    "Mocha",
+  final _scaffold = GlobalKey<ScaffoldState>();
+  final _search = TextEditingController();
+  String _category = 'All';
+  static const _titles = [
+    'Coffee Shop',
+    'Favorites',
+    'Your cart',
+    'Notifications',
   ];
-
-  List<Coffee> get filteredCoffees {
-    final query = _searchQuery.trim().toLowerCase();
-    return sampleCoffees.where((coffee) {
-      final matchesCategory =
-          _selectedCategoryIndex == 0 ||
-          coffee.name.toLowerCase() ==
-              categories[_selectedCategoryIndex].toLowerCase();
-      final matchesSearch =
-          query.isEmpty ||
-          coffee.name.toLowerCase().contains(query) ||
-          coffee.subtitle.toLowerCase().contains(query) ||
-          coffee.description.toLowerCase().contains(query);
-
-      if (query.isNotEmpty) {
-        return matchesSearch;
-      }
-      return matchesCategory;
-    }).toList();
-  }
-
-  Widget _getSelectedPage() {
-    switch (_selectedIndex) {
-      case 0:
-        return _buildHomeBody();
-      case 1:
-        return const FavoriteScreen();
-      case 2:
-        return const CartScreen();
-      case 3:
-        return const NotificationScreen();
-      default:
-        return _buildHomeBody();
-    }
-  }
-
+  static const _categories = [
+    'All',
+    'Cappuccino',
+    'Latte',
+    'Espresso',
+    'Americano',
+    'Mocha',
+  ];
   @override
   void dispose() {
-    _searchController.dispose();
+    _search.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      drawer: CustomDrawer(
-        onSelectTab: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-      ),
-      body: _getSelectedPage(),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: "Favorite",
+  Widget build(BuildContext context) => GetBuilder<ShopNavigation>(
+    builder: (navigation) => PopScope(
+      canPop: navigation.index == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) navigation.select(0);
+      },
+      child: Scaffold(
+        key: _scaffold,
+        drawer: CustomDrawer(onSelectTab: navigation.select),
+        appBar: AppBar(
+          leading: IconButton(
+            key: const ValueKey('open-menu'),
+            tooltip: 'Open menu',
+            icon: const Icon(Icons.grid_view_rounded),
+            onPressed: () => _scaffold.currentState!.openDrawer(),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: "Cart",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: "Notification",
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHomeBody() {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          title: Text(_titles[navigation.index]),
+          actions: [
+            IconButton(
+              tooltip: 'Profile & settings',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(builder: (_) => const ProfileScreen()),
+              ),
+              icon: const Icon(Icons.person_outline_rounded),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: SafeArea(
+          top: false,
+          child: IndexedStack(
+            index: navigation.index,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Open Navigation Drawer Button
-                    Builder(
-                      builder: (context) => IconButton(
-                        onPressed: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                        icon: Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Icon(Icons.apps, color: Colors.orange),
-                        ),
-                      ),
-                    ),
-
-                    // Navigate to Profile Screen Button
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProfileScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            "assets/Ahsan.png",
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: BoldText(
-                  text: "Find the best\nCoffee for you",
-                  size: 35,
-                  color:
-                      Theme.of(context).textTheme.bodyLarge?.color ??
-                      Colors.white,
-                ),
-              ),
-              const SizedBox(height: 25),
-
-              // Interactive Search Bar
-              Container(
-                width: double.maxFinite,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.orange.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.search, color: Colors.orange),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _searchController,
-                          onChanged: (value) {
-                            setState(() {
-                              _searchQuery = value;
-                            });
-                          },
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).textTheme.bodyLarge?.color ??
-                                Colors.white,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: "Find your coffee...",
-                            hintStyle: TextStyle(color: Colors.grey.shade500),
-                            border: InputBorder.none,
-                            suffixIcon: _searchQuery.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(
-                                      Icons.clear,
-                                      color: Colors.grey,
-                                      size: 18,
-                                    ),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      setState(() {
-                                        _searchQuery = "";
-                                      });
-                                    },
-                                  )
-                                : null,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Categories Row
-              const SizedBox(height: 30),
-              SizedBox(
-                height: 35,
-                width: double.maxFinite,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final isSelected = _selectedCategoryIndex == index;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedCategoryIndex = index;
-                        });
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 12),
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.orange.withValues(alpha: 0.2)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                          border: isSelected
-                              ? Border.all(color: Colors.orange, width: 1)
-                              : null,
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              BoldText(
-                                text: categories[index],
-                                size: 15,
-                                color: isSelected
-                                    ? Colors.orange
-                                    : Colors.grey.shade500,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 25),
-
-              // Filtered Coffee Tile List
-              Tile(coffees: filteredCoffees),
-
-              const SizedBox(height: 30),
-
-              BoldText(
-                text:
-                    'Special for you, ${Get.find<AuthController>().user?.name.split(' ').first ?? 'coffee lover'}!',
-                color:
-                    Theme.of(context).textTheme.bodyLarge?.color ??
-                    Colors.white,
-              ),
-
-              const SizedBox(height: 12),
-
-              Tile2(specials: sampleCoffees.take(2).toList()),
+              _catalog(),
+              const FavoriteScreen(embedded: true),
+              const CartScreen(embedded: true),
+              const NotificationScreen(embedded: true),
             ],
           ),
         ),
+        bottomNavigationBar: GetBuilder<CartController>(
+          builder: (cart) => GetBuilder<NotificationController>(
+            builder: (notifications) => NavigationBar(
+              selectedIndex: navigation.index,
+              onDestinationSelected: (index) {
+                FocusManager.instance.primaryFocus?.unfocus();
+                navigation.select(index);
+              },
+              destinations: [
+                const NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home_rounded),
+                  label: 'Home',
+                ),
+                const NavigationDestination(
+                  icon: Icon(Icons.favorite_border),
+                  selectedIcon: Icon(Icons.favorite),
+                  label: 'Favorites',
+                ),
+                NavigationDestination(
+                  icon: Badge(
+                    isLabelVisible: cart.itemCount > 0,
+                    label: Text('${cart.itemCount}'),
+                    child: const Icon(Icons.shopping_bag_outlined),
+                  ),
+                  label: 'Cart',
+                ),
+                NavigationDestination(
+                  icon: Badge(
+                    isLabelVisible: notifications.unreadCount > 0,
+                    label: Text('${notifications.unreadCount}'),
+                    child: const Icon(Icons.notifications_outlined),
+                  ),
+                  label: 'Alerts',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _catalog() {
+    final query = _search.text.trim().toLowerCase();
+    final coffees = sampleCoffees
+        .where(
+          (coffee) =>
+              (_category == 'All' || coffee.name == _category) &&
+              (query.isEmpty ||
+                  '${coffee.name} ${coffee.subtitle} ${coffee.description}'
+                      .toLowerCase()
+                      .contains(query)),
+        )
+        .toList();
+    final filtered = query.isNotEmpty || _category != 'All';
+    return PageBody(
+      child: ListView(
+        key: const PageStorageKey('catalog-scroll'),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        children: [
+          GetBuilder<AuthController>(
+            builder: (auth) => Text(
+              'Good coffee, ${auth.user?.name.split(' ').first ?? 'good company'}.',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Find your daily\ncoffee moment.',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+          ),
+          const SizedBox(height: 22),
+          TextField(
+            key: const ValueKey('coffee-search'),
+            controller: _search,
+            onChanged: (_) => setState(() {}),
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              hintText: 'Find your coffee...',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: query.isEmpty
+                  ? null
+                  : IconButton(
+                      tooltip: 'Clear search',
+                      icon: const Icon(Icons.close),
+                      onPressed: () => setState(_search.clear),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final category in _categories)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(category),
+                      selected: category == _category,
+                      onSelected: (_) => setState(() => _category = category),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          SectionTitle(
+            filtered ? 'Your selection' : 'Made for your mood',
+            subtitle: filtered
+                ? '${coffees.length} ${coffees.length == 1 ? 'coffee' : 'coffees'} found'
+                : 'Freshly brewed favorites, one cup at a time.',
+          ),
+          if (coffees.isEmpty)
+            EmptyState(
+              icon: Icons.search_off_rounded,
+              title: 'No coffee found',
+              message: 'Try another search or explore all our coffees.',
+              action: 'Clear filters',
+              onAction: () => setState(() {
+                _search.clear();
+                _category = 'All';
+              }),
+            )
+          else
+            Tile(coffees: coffees),
+          if (!filtered) ...[
+            const SectionTitle(
+              'A little extra comfort',
+              subtitle: 'Slow down with our house favorites.',
+            ),
+            Tile2(specials: [sampleCoffees[4], sampleCoffees[1]]),
+          ],
+        ],
       ),
     );
   }

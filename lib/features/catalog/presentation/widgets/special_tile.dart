@@ -1,109 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:my_coffee_shop/features/catalog/domain/coffee.dart';
-import 'package:my_coffee_shop/features/catalog/presentation/pages/detail_page.dart';
-import 'package:my_coffee_shop/core/widgets/bold_text.dart';
-import 'package:my_coffee_shop/core/widgets/light_text.dart';
+
+import '../../../../core/widgets/shop_widgets.dart';
+import '../../domain/coffee.dart';
+import '../pages/detail_page.dart';
 
 class Tile2 extends StatelessWidget {
-  final List<Coffee> specials;
-
   const Tile2({super.key, required this.specials});
-
+  final List<Coffee> specials;
   @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF252525) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      scrollDirection: Axis.vertical,
-      itemCount: specials.length,
-      itemBuilder: (context, index) {
-        final coffee = specials[index];
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DetailsPage(coffee: coffee),
+  Widget build(BuildContext context) => Column(
+    children: [
+      for (final coffee in specials)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Material(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => DetailsPage(coffee: coffee),
+                ),
               ),
-            );
-          },
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 15),
-            height: 130,
-            width: double.maxFinite,
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: isDark
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.15),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  // Promo Image
-                  Container(
-                    height: 105,
-                    width: 105,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(coffee.imagePath),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: Image.asset(
+                        coffee.imagePath,
+                        height: 88,
+                        width: 88,
                         fit: BoxFit.cover,
                       ),
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ),
-                  const SizedBox(width: 15),
-
-                  // Text Info
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        BoldText(text: coffee.name, size: 15, color: textColor),
-                        const SizedBox(height: 6),
-                        LightText(
-                          text: coffee.subtitle,
-                          size: 11,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            BoldText(
-                              text: "\$",
-                              size: 14,
-                              color: Colors.orange,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            coffee.name,
+                            style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 17,
                             ),
-                            const SizedBox(width: 2),
-                            BoldText(
-                              text: coffee.price.toStringAsFixed(2),
-                              size: 14,
-                              color: textColor,
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            coffee.subtitle,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            money(coffee.priceCentsFor('S')),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+    ],
+  );
 }

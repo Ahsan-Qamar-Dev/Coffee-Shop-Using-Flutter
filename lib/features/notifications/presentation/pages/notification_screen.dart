@@ -1,164 +1,167 @@
 import 'package:flutter/material.dart';
-import 'package:my_coffee_shop/features/profile/presentation/pages/profile_screen.dart';
-import 'package:my_coffee_shop/core/widgets/bold_text.dart';
-import 'package:my_coffee_shop/core/widgets/light_text.dart';
+import 'package:get/get.dart';
+
+import '../../../../core/widgets/shop_widgets.dart';
+import '../../../orders/presentation/pages/order_pages.dart';
+import '../../../profile/presentation/controllers/profile_controller.dart';
+import '../../../profile/presentation/pages/profile_screen.dart';
+import '../controllers/notification_controller.dart';
 
 class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
-
-  final List<Map<String, String>> notifications = const [
-    {
-      'title': 'Order #1042 Prepared! ☕',
-      'body': 'Your hot Cappuccino is ready for pickup at the counter.',
-      'time': '2 mins ago',
-    },
-    {
-      'title': '20% OFF Mocha Today! 🎉',
-      'body': 'Enjoy a special discount on all Mocha beverages today only.',
-      'time': '1 hour ago',
-    },
-    {
-      'title': 'Welcome to Coffee Shop! 🌟',
-      'body': 'Thank you for signing up. Enjoy your coffee journey with us.',
-      'time': 'Yesterday',
-    },
-  ];
-
+  const NotificationScreen({super.key, this.embedded = false});
+  final bool embedded;
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF1E222A) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
-
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top Header Bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Builder(
-                    builder: (context) => IconButton(
-                      icon: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.apps, color: Colors.orange),
-                      ),
-                      onPressed: () => Scaffold.of(context).openDrawer(),
-                    ),
-                  ),
-                  BoldText(text: "Notifications", size: 20, color: textColor),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfileScreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          "assets/Ahsan.png",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: notifications.length,
-                  itemBuilder: (context, index) {
-                    final item = notifications[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 14),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.orange.withValues(alpha: 0.3),
-                        ),
-                        boxShadow: isDark
-                            ? null
-                            : [
-                                BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                      ),
-                      child: Row(
+    final body = GetBuilder<NotificationController>(
+      builder: (notifications) => PageBody(
+        maxWidth: 760,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+          children: [
+            GetBuilder<ProfileController>(
+              builder: (profile) => profile.orderAlerts
+                  ? const SizedBox.shrink()
+                  : ShopCard(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.orange.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(12),
+                          const Text('Order alerts are turned off.'),
+                          TextButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (_) => const ProfileScreen(),
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.notifications_active,
-                              color: Colors.orange,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                BoldText(
-                                  text: item['title']!,
-                                  size: 15,
-                                  color: textColor,
-                                ),
-                                const SizedBox(height: 4),
-                                LightText(
-                                  text: item['body']!,
-                                  size: 12,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(height: 8),
-                                LightText(
-                                  text: item['time']!,
-                                  size: 10,
-                                  color: Colors.orange,
-                                ),
-                              ],
-                            ),
+                            child: const Text('Manage preferences'),
                           ),
                         ],
                       ),
-                    );
-                  },
+                    ),
+            ),
+            if (notifications.items.isEmpty)
+              EmptyState(
+                icon: Icons.notifications_none_rounded,
+                title: 'All quiet for now',
+                message: 'Your order updates will appear here. Place a preview order to try it out.',
+                action: 'View orders',
+                onAction: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => const OrdersScreen()),
                 ),
+              )
+            else ...[
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 12,
+                children: [
+                  TextButton(
+                    onPressed: notifications.unreadCount == 0
+                        ? null
+                        : notifications.markAllRead,
+                    child: const Text('Mark all read'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      if (await confirmAction(
+                        context,
+                        title: 'Clear notifications?',
+                        message:
+                            'Your orders will still be available in My orders.',
+                        action: 'Clear all',
+                      )) {
+                        notifications.clear();
+                      }
+                    },
+                    child: const Text('Clear all'),
+                  ),
+                ],
               ),
+              for (final item in notifications.items)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Material(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(24),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () {
+                        notifications.markRead(item);
+                        if (item.orderId != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (_) =>
+                                  OrderDetailScreen(orderId: item.orderId!),
+                            ),
+                          );
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Badge(
+                              isLabelVisible: !item.read,
+                              child: Icon(
+                                Icons.local_cafe_outlined,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.title,
+                                    style: TextStyle(
+                                      fontWeight: item.read
+                                          ? FontWeight.w500
+                                          : FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    item.body,
+                                    style: TextStyle(
+                                      height: 1.5,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    orderDate(item.createdAt),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
-          ),
+          ],
         ),
       ),
     );
+    return embedded
+        ? body
+        : Scaffold(
+            appBar: AppBar(title: const Text('Notifications')),
+            body: SafeArea(child: body),
+          );
   }
 }
