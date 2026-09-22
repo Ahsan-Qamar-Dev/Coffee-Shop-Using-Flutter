@@ -3,8 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../app/shop_navigation.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/shop_widgets.dart';
+import '../../../../core/widgets/shop_motion.dart';
 import '../../../cart/presentation/controllers/cart_controller.dart';
 import '../../domain/coffee.dart';
 import '../pages/detail_page.dart';
@@ -53,6 +55,7 @@ class Tile extends StatelessWidget {
                                 child: Image.asset(
                                   coffee.imagePath,
                                   fit: BoxFit.cover,
+                                  cacheWidth: 512,
                                   semanticLabel: coffee.name,
                                 ),
                               ),
@@ -111,10 +114,8 @@ class Tile extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 6,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          alignment: WrapAlignment.spaceBetween,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               money(coffee.priceCentsFor('S')),
@@ -124,7 +125,7 @@ class Tile extends StatelessWidget {
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
-                            IconButton.filled(
+                            CompactActionButton(
                               key: ValueKey('quick-add-${coffee.id}'),
                               tooltip: 'Add small ${coffee.name}',
                               onPressed: () {
@@ -132,9 +133,12 @@ class Tile extends StatelessWidget {
                                 AppFeedback.show(
                                   context,
                                   'Added ${coffee.name} (S) to cart',
+                                  actionLabel: 'View cart',
+                                  onAction: () => openShopTab(context, 2),
                                 );
                               },
-                              icon: const Icon(Icons.add),
+                              icon: Icons.add_rounded,
+                              confirmAddition: true,
                             ),
                           ],
                         ),

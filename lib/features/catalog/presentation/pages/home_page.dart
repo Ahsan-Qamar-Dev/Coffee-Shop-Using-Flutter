@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../../app/shop_navigation.dart';
 import '../../../../app/widgets/custom_drawer.dart';
 import '../../../../core/widgets/shop_widgets.dart';
+import '../../../../core/widgets/shop_motion.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../cart/presentation/controllers/cart_controller.dart';
 import '../../../cart/presentation/pages/cart_screen.dart';
@@ -33,11 +34,13 @@ class _HomePageState extends State<HomePage> {
   ];
   static const _categories = [
     'All',
+    'Iced',
     'Cappuccino',
     'Latte',
     'Espresso',
     'Americano',
     'Mocha',
+    'Cold Brew',
   ];
   @override
   void dispose() {
@@ -77,7 +80,7 @@ class _HomePageState extends State<HomePage> {
         ),
         body: SafeArea(
           top: false,
-          child: IndexedStack(
+          child: MotionTabStack(
             index: navigation.index,
             children: [
               _catalog(),
@@ -135,7 +138,10 @@ class _HomePageState extends State<HomePage> {
     final coffees = sampleCoffees
         .where(
           (coffee) =>
-              (_category == 'All' || coffee.name == _category) &&
+              (_category == 'All' ||
+                  (_category == 'Iced'
+                      ? coffee.isIced
+                      : coffee.category == _category)) &&
               (query.isEmpty ||
                   '${coffee.name} ${coffee.subtitle} ${coffee.description}'
                       .toLowerCase()
@@ -206,7 +212,7 @@ class _HomePageState extends State<HomePage> {
             filtered ? 'Your selection' : 'Made for your mood',
             subtitle: filtered
                 ? '${coffees.length} ${coffees.length == 1 ? 'coffee' : 'coffees'} found'
-                : 'Freshly brewed favorites, one cup at a time.',
+                : '${sampleCoffees.length} coffees, from warm classics to iced favorites.',
           ),
           if (coffees.isEmpty)
             EmptyState(

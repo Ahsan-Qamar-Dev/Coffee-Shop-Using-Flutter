@@ -63,6 +63,7 @@ class NotificationScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
                       if (await confirmAction(
                         context,
                         title: 'Clear notifications?',
@@ -70,7 +71,21 @@ class NotificationScreen extends StatelessWidget {
                             'Your orders will still be available in My orders.',
                         action: 'Clear all',
                       )) {
+                        final cleared = List<ShopNotification>.from(
+                          notifications.items,
+                        );
                         notifications.clear();
+                        messenger
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: const Text('Notifications cleared'),
+                              action: SnackBarAction(
+                                label: 'Undo',
+                                onPressed: () => notifications.restore(cleared),
+                              ),
+                            ),
+                          );
                       }
                     },
                     child: const Text('Clear all'),

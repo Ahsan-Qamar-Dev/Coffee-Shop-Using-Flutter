@@ -170,7 +170,54 @@ void main() {
     expect(item.size, 'S');
     expect(item.totalCents, 420);
     expect(find.byType(DetailsPage), findsNothing);
+    expect(find.text('View cart'), findsOneWidget);
+    await tap(tester, find.text('View cart'));
+    expect(Get.find<ShopNavigation>().index, 2);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('specials and favorites offer direct cart actions', (
+    tester,
+  ) async {
+    await host(tester, const HomePage());
+    await tap(tester, find.byKey(const ValueKey('special-add-c5')));
+    expect(Get.find<CartController>().items.single.coffee.id, 'c5');
+
+    Get.find<FavoriteController>().toggleFavorite(sampleCoffees.first);
+    await host(tester, const FavoriteScreen());
+    await tap(tester, find.byKey(const ValueKey('favorite-add-c1')));
+    expect(Get.find<CartController>().items.length, 2);
+    expect(find.text('View cart'), findsOneWidget);
+  });
+
+  testWidgets('cart removal and favorite removal can be undone', (
+    tester,
+  ) async {
+    Get.find<CartController>().addItem(sampleCoffees.first, 'S');
+    await host(tester, const CartScreen());
+    await tap(tester, find.byTooltip('Remove ${sampleCoffees.first.name}'));
+    expect(Get.find<CartController>().items, isEmpty);
+    await tap(tester, find.text('Undo'));
+    expect(Get.find<CartController>().items, hasLength(1));
+
+    Get.find<FavoriteController>().toggleFavorite(sampleCoffees.first);
+    await host(tester, const FavoriteScreen());
+    await tap(tester, find.byTooltip('Unsave ${sampleCoffees.first.name}'));
+    expect(Get.find<FavoriteController>().favorites, isEmpty);
+    await tap(tester, find.text('Undo'));
+    expect(Get.find<FavoriteController>().favorites, hasLength(1));
+  });
+
+  testWidgets('clearing notifications can be undone', (tester) async {
+    Get.find<NotificationController>().addOrder('CF-1001');
+    await host(tester, const NotificationScreen());
+    await tester.tap(find.text('Clear all').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Clear all'));
+    await tester.pumpAndSettle();
+    expect(Get.find<NotificationController>().items, isEmpty);
+    await tap(tester, find.text('Undo'));
+    expect(Get.find<NotificationController>().items, hasLength(1));
   });
 
   testWidgets(
@@ -194,6 +241,7 @@ void main() {
       expect(orders.orders.single.draft.totalCents, 470);
       expect(Get.find<CartController>().items, isEmpty);
       expect(find.byType(OrderDetailScreen), findsOneWidget);
+      expect(find.byKey(const ValueKey('download-receipt')), findsOneWidget);
       await tap(tester, find.text('Continue shopping'));
       expect(Get.find<ShopNavigation>().index, 0);
       Get.find<ShopNavigation>().select(3);

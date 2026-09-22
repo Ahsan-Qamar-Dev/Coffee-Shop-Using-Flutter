@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../../app/shop_navigation.dart';
 import '../../../../core/widgets/shop_widgets.dart';
+import '../../../../core/widgets/shop_motion.dart';
 import '../../../catalog/presentation/pages/detail_page.dart';
 import '../../../checkout/presentation/pages/payment_screen.dart';
 import '../controllers/cart_controller.dart';
@@ -10,6 +11,27 @@ import '../controllers/cart_controller.dart';
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key, this.embedded = false});
   final bool embedded;
+
+  void _removeWithUndo(BuildContext context, CartController cart, item) {
+    final quantity = item.quantity;
+    cart.removeItem(item);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('Removed ${item.coffee.name} from cart'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              item.quantity = quantity;
+              cart.restoreItem(item);
+            },
+          ),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     final body = GetBuilder<CartController>(
@@ -60,6 +82,7 @@ class CartScreen extends StatelessWidget {
                                     height: 76,
                                     width: 76,
                                     fit: BoxFit.cover,
+                                    cacheWidth: 256,
                                   ),
                                 ),
                               ),
@@ -91,7 +114,8 @@ class CartScreen extends StatelessWidget {
                             ),
                             IconButton(
                               tooltip: 'Remove ${item.coffee.name}',
-                              onPressed: () => cart.removeItem(item),
+                              onPressed: () =>
+                                  _removeWithUndo(context, cart, item),
                               icon: const Icon(Icons.close, size: 20),
                             ),
                           ],
@@ -114,27 +138,37 @@ class CartScreen extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                IconButton.outlined(
+                                CompactActionButton(
+                                  filled: false,
                                   tooltip: 'Decrease ${item.coffee.name}',
-                                  onPressed: () => cart.decrementQuantity(item),
-                                  icon: const Icon(Icons.remove),
+                                  onPressed: () {
+                                    if (item.quantity == 1) {
+                                      _removeWithUndo(context, cart, item);
+                                    } else {
+                                      cart.decrementQuantity(item);
+                                    }
+                                  },
+                                  icon: Icons.remove_rounded,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
+                                    horizontal: 4,
                                   ),
-                                  child: Text(
-                                    '${item.quantity}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                  child: AnimatedValue(
+                                    value: item.quantity,
+                                    child: Text(
+                                      '${item.quantity}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ),
-                                IconButton.filled(
+                                CompactActionButton(
                                   tooltip: 'Increase ${item.coffee.name}',
                                   onPressed: () => cart.incrementQuantity(item),
-                                  icon: const Icon(Icons.add),
+                                  icon: Icons.add_rounded,
                                 ),
                               ],
                             ),

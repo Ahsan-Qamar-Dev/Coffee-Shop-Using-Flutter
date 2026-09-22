@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../../app/shop_navigation.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/shop_widgets.dart';
+import '../../../../core/widgets/shop_motion.dart';
 import '../../../cart/presentation/controllers/cart_controller.dart';
 import '../../../favorites/presentation/controllers/favorite_controller.dart';
 import '../../domain/coffee.dart';
@@ -41,9 +42,12 @@ class _DetailsPageState extends State<DetailsPage> {
               final saved = favorites.isFavorite(coffee);
               return IconButton(
                 tooltip: saved ? 'Remove from favorites' : 'Save to favorites',
-                icon: Icon(
-                  saved ? Icons.favorite : Icons.favorite_border,
-                  color: saved ? const Color(0xFFE88376) : null,
+                icon: AnimatedValue(
+                  value: saved,
+                  child: Icon(
+                    saved ? Icons.favorite : Icons.favorite_border,
+                    color: saved ? const Color(0xFFE88376) : null,
+                  ),
                 ),
                 onPressed: () {
                   favorites.toggleFavorite(coffee);
@@ -76,6 +80,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     child: Image.asset(
                       coffee.imagePath,
                       fit: BoxFit.cover,
+                      cacheWidth: 1400,
                       semanticLabel: coffee.name,
                     ),
                   ),
@@ -112,6 +117,14 @@ class _DetailsPageState extends State<DetailsPage> {
                   ),
                 ],
               ),
+              if (coffee.isIced)
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Chip(
+                    avatar: Icon(Icons.ac_unit_rounded, size: 18),
+                    label: Text('Served over ice'),
+                  ),
+                ),
               const SectionTitle('Description'),
               Text(
                 coffee.description,
@@ -173,12 +186,15 @@ class _DetailsPageState extends State<DetailsPage> {
                       'Size $_size · Price',
                       style: TextStyle(color: colors.onSurfaceVariant),
                     ),
-                    Text(
-                      money(coffee.priceCentsFor(_size)),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: colors.primary,
+                    AnimatedValue(
+                      value: _size,
+                      child: Text(
+                        money(coffee.priceCentsFor(_size)),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: colors.primary,
+                        ),
                       ),
                     ),
                   ],
@@ -189,9 +205,11 @@ class _DetailsPageState extends State<DetailsPage> {
                     AppFeedback.show(
                       context,
                       'Added ${coffee.name} ($_size) to cart',
+                      actionLabel: 'View cart',
+                      onAction: () => openShopTab(context, 2),
                     );
                   },
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(Icons.add_rounded, size: 18),
                   label: const Text('Add to Cart'),
                 ),
               ],

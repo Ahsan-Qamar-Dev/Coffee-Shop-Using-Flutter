@@ -66,6 +66,19 @@ class CartController extends GetxController {
     update();
   }
 
+  void restoreItem(CartItem item) {
+    final existingIndex = _items.indexWhere(
+      (current) =>
+          current.coffee.id == item.coffee.id && current.size == item.size,
+    );
+    if (existingIndex >= 0) {
+      _items[existingIndex].quantity += item.quantity;
+    } else {
+      _items.add(item);
+    }
+    update();
+  }
+
   /// Clears the entire cart (e.g. after payment)
   void clearCart() {
     _items.clear();

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
+
+import '../widgets/shop_motion.dart';
 
 class AppTheme {
   static const accent = Color(0xFFD97736);
@@ -16,6 +19,15 @@ class AppTheme {
         );
     return ThemeData(
       useMaterial3: true,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ShopPageTransitions(),
+          TargetPlatform.windows: ShopPageTransitions(),
+          TargetPlatform.linux: ShopPageTransitions(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
       fontFamily: 'Roboto',
       brightness: brightness,
       colorScheme: scheme,

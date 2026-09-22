@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppFeedback {
-  static void show(BuildContext context, String message, {bool error = false}) {
+  static void show(
+    BuildContext context,
+    String message, {
+    bool error = false,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
@@ -15,6 +21,13 @@ class AppFeedback {
         duration: const Duration(seconds: 4),
         showCloseIcon: true,
         closeIconColor: Colors.white,
+        action: actionLabel != null && onAction != null
+            ? SnackBarAction(
+                label: actionLabel,
+                textColor: const Color(0xFFFFBF8D),
+                onPressed: onAction,
+              )
+            : null,
         content: Row(
           children: [
             Icon(

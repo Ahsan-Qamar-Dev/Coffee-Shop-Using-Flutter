@@ -48,4 +48,11 @@ class NotificationController extends GetxController {
     _items.clear();
     update();
   }
+
+  void restore(List<ShopNotification> items) {
+    _items
+      ..clear()
+      ..addAll(items);
+    update();
+  }
 }

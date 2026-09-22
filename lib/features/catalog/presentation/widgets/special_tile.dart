@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../../../app/shop_navigation.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/shop_widgets.dart';
+import '../../../../core/widgets/shop_motion.dart';
+import '../../../cart/presentation/controllers/cart_controller.dart';
 import '../../domain/coffee.dart';
 import '../pages/detail_page.dart';
 
@@ -66,6 +71,22 @@ class Tile2 extends StatelessWidget {
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
                             ),
+                          ),
+                          const SizedBox(height: 8),
+                          CompactActionButton(
+                            key: ValueKey('special-add-${coffee.id}'),
+                            tooltip: 'Add small ${coffee.name}',
+                            onPressed: () {
+                              Get.find<CartController>().addItem(coffee, 'S');
+                              AppFeedback.show(
+                                context,
+                                'Added ${coffee.name} (S) to cart',
+                                actionLabel: 'View cart',
+                                onAction: () => openShopTab(context, 2),
+                              );
+                            },
+                            icon: Icons.add_shopping_cart,
+                            confirmAddition: true,
                           ),
                         ],
                       ),

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../app/shop_navigation.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/shop_widgets.dart';
+import '../../../cart/presentation/controllers/cart_controller.dart';
 import '../../../catalog/presentation/pages/detail_page.dart';
 import '../controllers/favorite_controller.dart';
 
@@ -85,13 +87,44 @@ class FavoriteScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            IconButton(
-                              tooltip: 'Unsave ${coffee.name}',
-                              onPressed: () => favorites.toggleFavorite(coffee),
-                              icon: const Icon(
-                                Icons.favorite,
-                                color: Color(0xFFE88376),
-                              ),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  key: ValueKey('favorite-add-${coffee.id}'),
+                                  tooltip: 'Add small ${coffee.name} to cart',
+                                  onPressed: () {
+                                    Get.find<CartController>().addItem(
+                                      coffee,
+                                      'S',
+                                    );
+                                    AppFeedback.show(
+                                      context,
+                                      'Added ${coffee.name} (S) to cart',
+                                      actionLabel: 'View cart',
+                                      onAction: () => openShopTab(context, 2),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.add_shopping_cart),
+                                ),
+                                IconButton(
+                                  tooltip: 'Unsave ${coffee.name}',
+                                  onPressed: () {
+                                    favorites.toggleFavorite(coffee);
+                                    AppFeedback.show(
+                                      context,
+                                      'Removed ${coffee.name} from favorites',
+                                      actionLabel: 'Undo',
+                                      onAction: () =>
+                                          favorites.toggleFavorite(coffee),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.favorite,
+                                    color: Color(0xFFE88376),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

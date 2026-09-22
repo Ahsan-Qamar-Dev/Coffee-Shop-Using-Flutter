@@ -48,6 +48,8 @@ void main() {
   for (final brightness in Brightness.values) {
     for (final name in [
       'home',
+      'iced',
+      'white_mocha',
       'detail',
       'cart',
       'checkout',
@@ -90,6 +92,7 @@ void main() {
         if (name == 'notifications') Get.find<ShopNavigation>().select(3);
         final Widget page = switch (name) {
           'detail' => DetailsPage(coffee: sampleCoffees.first),
+          'white_mocha' => DetailsPage(coffee: sampleCoffees[9]),
           'checkout' => const PaymentScreen(),
           'profile' => const ProfileScreen(),
           'address' => const AddressScreen(),
@@ -110,6 +113,10 @@ void main() {
           }
         });
         await tester.pumpAndSettle();
+        if (name == 'iced') {
+          await tester.tap(find.widgetWithText(ChoiceChip, 'Iced'));
+          await tester.pumpAndSettle();
+        }
         expect(tester.takeException(), isNull);
         await expectLater(
           find.byKey(const ValueKey('preview')),

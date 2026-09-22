@@ -6,6 +6,7 @@ import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/shop_widgets.dart';
 import '../../../cart/presentation/controllers/cart_controller.dart';
 import '../../../profile/domain/customer_preferences.dart';
+import '../widgets/receipt_download_button.dart';
 import '../controllers/order_controller.dart';
 
 String orderDate(DateTime value) =>
@@ -207,6 +208,8 @@ class OrderDetailScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 14),
+                ReceiptDownloadButton(order: order),
                 SectionTitle(
                   draft.delivery ? 'Delivery details' : 'Pickup details',
                 ),

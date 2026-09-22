@@ -6,6 +6,9 @@ class Coffee {
   final double price;
   final double rating;
   final String imagePath;
+  final String category;
+  final bool containsMilk;
+  final bool isIced;
 
   const Coffee({
     required this.id,
@@ -15,6 +18,9 @@ class Coffee {
     required this.price,
     required this.rating,
     required this.imagePath,
+    required this.category,
+    required this.containsMilk,
+    this.isIced = false,
   });
 
   int priceCentsFor(String size) {
@@ -28,7 +34,4 @@ class Coffee {
             ? 100
             : 0);
   }
-
-  bool get containsMilk =>
-      const ['Cappuccino', 'Latte', 'Mocha'].contains(name);
 }
