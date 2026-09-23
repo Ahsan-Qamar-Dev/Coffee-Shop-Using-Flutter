@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:my_coffee_shop/features/catalog/domain/coffee.dart';
 
 class FavoriteController extends GetxController {
+  void Function()? onChanged;
   final List<Coffee> _favoriteCoffees = [];
 
   List<Coffee> get favorites => List.unmodifiable(_favoriteCoffees);
@@ -9,6 +10,7 @@ class FavoriteController extends GetxController {
   void clear() {
     _favoriteCoffees.clear();
     update();
+    onChanged?.call();
   }
 
   /// Checks if a coffee is in the favorites list
@@ -25,5 +27,6 @@ class FavoriteController extends GetxController {
       _favoriteCoffees.add(coffee);
     }
     update();
+    onChanged?.call();
   }
 }

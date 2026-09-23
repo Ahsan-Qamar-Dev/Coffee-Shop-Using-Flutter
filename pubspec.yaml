@@ -37,6 +37,7 @@ dependencies:
   get: ^4.7.3
   pdf: ^3.13.1
   printing: ^5.15.1
+  supabase_flutter: ^2.17.2
 
 dev_dependencies:
   flutter_test:

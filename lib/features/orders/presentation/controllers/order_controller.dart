@@ -23,8 +23,12 @@ class OrderController extends GetxController {
     update();
     try {
       final order = await repository.place(draft);
+      _orders.removeWhere((item) => item.id == order.id);
       _orders.insert(0, order);
       return order;
+    } on OrderFailure catch (e) {
+      error = e.message;
+      return null;
     } catch (_) {
       error = 'We could not create your order. Your cart is safe; please try again.';
       return null;
@@ -43,6 +47,9 @@ class OrderController extends GetxController {
     try {
       _orders[index] = await repository.cancel(_orders[index]);
       return true;
+    } on OrderFailure catch (e) {
+      error = e.message;
+      return false;
     } catch (_) {
       error = 'Could not cancel the order. Please try again.';
       return false;
@@ -50,6 +57,11 @@ class OrderController extends GetxController {
       busy = false;
       update();
     }
+  }
+
+  void restore(List<CoffeeOrder> orders) {
+    _orders..clear()..addAll(orders);
+    update();
   }
 
   void clear() {

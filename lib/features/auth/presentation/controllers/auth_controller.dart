@@ -6,6 +6,9 @@ import '../../domain/auth_user.dart';
 class AuthController extends GetxController {
   final AuthRepository repository;
   AuthController(this.repository);
+  Future<void> Function()? loadSession;
+  Future<void> Function()? beforeSignOut;
+  void Function()? clearSession;
   bool busy = false;
   String? error;
   AuthUser? user;
@@ -34,10 +37,12 @@ class AuthController extends GetxController {
 
   Future<bool> signIn(String email, String password) => _run(() async {
     user = await repository.signIn(email, password);
+    await loadSession?.call();
   });
   Future<bool> signUp(String name, String email, String password) =>
       _run(() async {
         user = await repository.signUp(name, email, password);
+        await loadSession?.call();
       });
   Future<bool> resetPassword(String email) =>
       _run(() => repository.requestPasswordReset(email));
@@ -55,7 +60,9 @@ class AuthController extends GetxController {
         );
       });
   Future<bool> signOut() => _run(() async {
+    await beforeSignOut?.call();
     await repository.signOut();
+    clearSession?.call();
     user = null;
   });
 }

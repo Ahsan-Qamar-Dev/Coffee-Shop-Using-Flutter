@@ -1,0 +1,16 @@
+-- Generated from sample_catalog.dart; preserves existing merchant edits.
+begin;
+insert into public.coffees (id, name, subtitle, description, price_cents, rating, image_path, category, contains_milk, is_iced, sort_order) values
+('c1', 'Cappuccino', 'With Steamed Milk', 'A cappuccino is an Italian coffee drink that is traditionally prepared with equal parts double espresso, steamed milk, and steamed milk foam on top.', 420, 4.5, 'assets/Cappacuino.png', 'Cappuccino', true, false, 0),
+('c2', 'Latte', 'With Creamy Foam', 'A latte is a classic espresso-based drink made with one or two shots of espresso, plenty of steamed milk, and a thin layer of light microfoam on top.', 380, 4.2, 'assets/latte-coffee-cup.jpg', 'Latte', true, false, 1),
+('c3', 'Espresso', 'Pure Double Shot', 'Espresso is a concentrated form of coffee served in small, strong shots. It is brewed by forcing hot water under high pressure through finely-ground coffee beans.', 250, 4.8, 'assets/Espresso.jpg', 'Espresso', false, false, 2),
+('c4', 'Americano', 'Hot Water & Espresso', 'A Caffe Americano is prepared by diluting an espresso shot with hot water, giving it a similar strength to, but different flavor from, traditionally brewed coffee.', 300, 4.0, 'assets/Americano.jfif', 'Americano', false, false, 3),
+('c5', 'Mocha', 'With Dark Chocolate', 'A caffe mocha is a chocolate-flavored variant of a latte. Made with espresso, hot milk, and sweet dark chocolate syrup topped with velvety milk foam.', 450, 4.7, 'assets/Mocha.jfif', 'Mocha', true, false, 4),
+('c6', 'Flat White', 'Silky Milk & Rich Espresso', 'A double espresso softened with silky steamed milk and a fine layer of microfoam. Smooth and full-bodied, with a rich coffee finish and just enough natural sweetness.', 410, 4.7, 'assets/menu/flat-white.png', 'Latte', true, false, 5),
+('c7', 'Caramel Latte', 'Buttery Caramel & Microfoam', 'Rich espresso meets steamed milk and buttery caramel, finished with a delicate caramel drizzle. A mellow, gently sweet cup with a warm toasted finish.', 460, 4.6, 'assets/menu/caramel-latte.png', 'Latte', true, false, 6),
+('c8', 'Iced Latte', 'Chilled Espresso & Milk', 'Fresh espresso poured over cold milk and generous ice for a refreshing, balanced cup. Creamy and coffee-forward, with a smooth finish that stays light and bright.', 420, 4.6, 'assets/menu/iced-latte.png', 'Latte', true, true, 7),
+('c9', 'Cold Brew', 'Slow Steeped & Served Over Ice', 'Coarsely ground coffee steeped in cold water for a rounded, mellow flavor, then served over ice. Enjoy a clean black coffee with subtle cocoa notes and a refreshing finish.', 390, 4.7, 'assets/menu/cold-brew.png', 'Cold Brew', false, true, 8),
+('c10', 'White Chocolate Mocha', 'White Chocolate & Espresso', 'Espresso blended with creamy white chocolate and steamed milk, crowned with soft foam and white chocolate curls. A smooth, indulgent cup with a delicate vanilla-like sweetness.', 490, 4.8, 'assets/menu/white-mocha.png', 'Mocha', true, false, 9),
+('c11', 'Cortado', 'Equal Espresso & Silky Milk', 'Equal parts espresso and warm steamed milk create a small, beautifully balanced coffee. A thin layer of microfoam softens the bold espresso without hiding its character.', 340, 4.5, 'assets/menu/cortado.png', 'Espresso', true, false, 10)
+on conflict (id) do nothing;
+commit;

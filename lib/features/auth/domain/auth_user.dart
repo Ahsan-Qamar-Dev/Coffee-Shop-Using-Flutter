@@ -1,7 +1,8 @@
 class AuthUser {
+  final String id;
   final String name;
   final String email;
-  const AuthUser({required this.name, required this.email});
+  const AuthUser({this.id = '', required this.name, required this.email});
 }
 
 class AuthFailure implements Exception {

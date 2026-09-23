@@ -15,6 +15,7 @@ class ShopNotification {
 }
 
 class NotificationController extends GetxController {
+  void Function()? onChanged;
   final List<ShopNotification> _items = [];
   List<ShopNotification> get items => List.unmodifiable(_items);
   int get unreadCount => _items.where((item) => !item.read).length;
@@ -30,11 +31,13 @@ class NotificationController extends GetxController {
       ),
     );
     update();
+    onChanged?.call();
   }
 
   void markRead(ShopNotification item) {
     item.read = true;
     update();
+    onChanged?.call();
   }
 
   void markAllRead() {
@@ -42,11 +45,13 @@ class NotificationController extends GetxController {
       item.read = true;
     }
     update();
+    onChanged?.call();
   }
 
   void clear() {
     _items.clear();
     update();
+    onChanged?.call();
   }
 
   void restore(List<ShopNotification> items) {
@@ -54,5 +59,6 @@ class NotificationController extends GetxController {
       ..clear()
       ..addAll(items);
     update();
+    onChanged?.call();
   }
 }

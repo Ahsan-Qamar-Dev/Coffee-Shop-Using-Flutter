@@ -3,6 +3,7 @@ import 'package:my_coffee_shop/features/cart/domain/cart_item.dart';
 import 'package:my_coffee_shop/features/catalog/domain/coffee.dart';
 
 class CartController extends GetxController {
+  void Function()? onChanged;
   final List<CartItem> _items = [];
 
   List<CartItem> get items => List.unmodifiable(_items);
@@ -40,6 +41,7 @@ class CartController extends GetxController {
       _items.add(CartItem(coffee: coffee, size: size, quantity: 1));
     }
     update();
+    onChanged?.call();
   }
 
   /// Increments quantity for a specific cart item
@@ -47,6 +49,7 @@ class CartController extends GetxController {
     if (!_items.contains(item)) return;
     item.quantity++;
     update();
+    onChanged?.call();
   }
 
   /// Decrements quantity; if quantity reaches 0, removes the item
@@ -58,12 +61,14 @@ class CartController extends GetxController {
       _items.remove(item);
     }
     update();
+    onChanged?.call();
   }
 
   /// Removes an item completely from cart
   void removeItem(CartItem item) {
     _items.remove(item);
     update();
+    onChanged?.call();
   }
 
   void restoreItem(CartItem item) {
@@ -77,11 +82,13 @@ class CartController extends GetxController {
       _items.add(item);
     }
     update();
+    onChanged?.call();
   }
 
   /// Clears the entire cart (e.g. after payment)
   void clearCart() {
     _items.clear();
     update();
+    onChanged?.call();
   }
 }
