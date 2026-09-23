@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/backend/backend_config.dart';
+
 import 'package:get/get.dart';
 
 import '../../../../core/widgets/app_feedback.dart';
@@ -103,7 +106,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   const SizedBox(height: 6),
                   Text(auth.user?.email ?? 'Preview account'),
                   const SizedBox(height: 6),
-                  const Text('Your email identifies this preview account.'),
+                  const Text('Your email identifies your account.'),
                 ],
               ),
             ),
@@ -257,7 +260,10 @@ class PaymentMethodsScreen extends StatelessWidget {
             'Your preferred way to pay',
             subtitle: 'Choose a default for checkout. No money is collected in this preview.',
           ),
-          for (final choice in PaymentChoice.values)
+          for (final choice
+              in BackendConfig.live
+                  ? [PaymentChoice.cash]
+                  : PaymentChoice.values)
             Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: ShopCard(
@@ -347,7 +353,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
           children: [
             const SectionTitle(
               'A fresh password',
-              subtitle: 'Use a test password for this preview account.',
+              subtitle: 'Choose a strong password unique to this account.',
             ),
             for (final entry in [
               (0, 'Current password', _current),

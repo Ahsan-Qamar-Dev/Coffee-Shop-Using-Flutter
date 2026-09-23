@@ -1,4 +1,11 @@
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../core/backend/backend_config.dart';
+import '../core/backend/customer_session.dart';
+import '../core/backend/supabase_customer_repository.dart';
+import '../features/auth/data/supabase_auth_repository.dart';
+import '../features/orders/data/supabase_order_repository.dart';
 
 import 'shop_navigation.dart';
 import '../features/profile/presentation/controllers/profile_controller.dart';
@@ -27,7 +34,12 @@ class AppBinding extends Bindings {
       Get.put(NotificationController(), permanent: true);
     }
     if (!Get.isRegistered<OrderRepository>()) {
-      Get.put<OrderRepository>(DemoOrderRepository(), permanent: true);
+      Get.put<OrderRepository>(
+        BackendConfig.live
+            ? SupabaseOrderRepository(Supabase.instance.client)
+            : DemoOrderRepository(),
+        permanent: true,
+      );
     }
     if (!Get.isRegistered<OrderController>()) {
       Get.put(OrderController(Get.find<OrderRepository>()), permanent: true);
@@ -42,10 +54,25 @@ class AppBinding extends Bindings {
       Get.put(FavoriteController(), permanent: true);
     }
     if (!Get.isRegistered<AuthRepository>()) {
-      Get.put<AuthRepository>(DemoAuthRepository(), permanent: true);
+      Get.put<AuthRepository>(
+        BackendConfig.live
+            ? SupabaseAuthRepository(Supabase.instance.client)
+            : DemoAuthRepository(),
+        permanent: true,
+      );
     }
     if (!Get.isRegistered<AuthController>()) {
       Get.put(AuthController(Get.find<AuthRepository>()), permanent: true);
+    }
+    if (BackendConfig.live && !Get.isRegistered<CustomerSession>()) {
+      Get.put(
+        CustomerSession(
+          Supabase.instance.client,
+          SupabaseCustomerRepository(Supabase.instance.client),
+          Get.find<OrderRepository>() as SupabaseOrderRepository,
+        ),
+        permanent: true,
+      );
     }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../core/backend/backend_config.dart';
+
 import '../features/auth/presentation/controllers/auth_controller.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/cart/presentation/controllers/cart_controller.dart';
@@ -36,8 +38,10 @@ Future<void> confirmSignOut(BuildContext context) async {
     context: context,
     builder: (context) => AlertDialog(
       title: const Text('Sign out?'),
-      content: const Text(
-        'Your cart, saved address and preview orders will be cleared for this session.',
+      content: Text(
+        BackendConfig.live
+            ? 'Your synced cart, favorites and orders will be available when you sign in again.'
+            : 'Your cart, saved address and preview orders will be cleared for this session.',
       ),
       actions: [
         TextButton(

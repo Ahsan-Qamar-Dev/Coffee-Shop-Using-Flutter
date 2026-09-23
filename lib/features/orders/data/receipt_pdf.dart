@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import '../../../../core/backend/backend_config.dart';
 
 import '../../profile/domain/customer_preferences.dart';
 import '../domain/coffee_order.dart';
@@ -33,7 +34,7 @@ class ReceiptPdf {
         footer: (context) => pw.Padding(
           padding: const pw.EdgeInsets.only(top: 14),
           child: pw.Text(
-            'Preview receipt | No payment taken or order sent.  Page ${context.pageNumber} of ${context.pagesCount}',
+            '${BackendConfig.live ? 'Private test receipt | No payment collected or coffee dispatched.' : 'Preview receipt | No payment taken or order sent.'}  Page ${context.pageNumber} of ${context.pagesCount}',
             textAlign: pw.TextAlign.center,
             style: const pw.TextStyle(color: _muted, fontSize: 9),
           ),

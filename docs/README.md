@@ -5,6 +5,8 @@ Start with the [main README](../README.md) for screenshots, features and setup.
 | Document | Purpose |
 | --- | --- |
 | [Roadmap](ROADMAP.md) | Current implementation and remaining work |
+| [Backend setup](BACKEND_SETUP.md) | Connected/private mode, configuration and owner order workflow |
+| [Backend checkpoint](BACKEND_CHECKPOINT.md) | Deployment, verification and next device checks |
 | [UI phase](UI_PHASE.md) | UI architecture and connected flows |
 | [Menu catalog](MENU_CATALOG.md) | Added drinks and generated image provenance |
 | [Motion](MOTION.md) | Animation behavior and Android refresh-rate preference |

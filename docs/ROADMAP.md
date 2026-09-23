@@ -10,19 +10,20 @@
 - Profile/settings, shared navigation, dark/light themes and accessible motion
 - Automated logic, widget and responsive-layout checks
 
-Android has been tested on a physical device. The app currently stores account and shopping state in memory; it does not process real payments or dispatch orders.
+The UI has been tested on Android hardware. Connected backend verification on a phone is pending; the app does not process real payments or dispatch orders.
 
-## Next: free backend integration
+## Connected: private Supabase backend
 
-Supabase with PostgreSQL is the selected direction. Integration is not yet part of the runnable app on `main`.
+Supabase with PostgreSQL is connected by default. The original demo remains available with `--dart-define=DEMO_MODE=true`. See [setup and current limits](BACKEND_SETUP.md).
 
-- [ ] Real authentication and session restoration
-- [ ] Private customer profiles, addresses, carts and favorites
-- [ ] Managed catalog with availability
-- [ ] Order creation with server-calculated prices and retry protection
-- [ ] Customer order history and status updates
-- [ ] Database access policies and isolation tests
-- [ ] Authentication email delivery and recovery configuration
+- [x] Real authentication and session restoration
+- [x] Private customer profiles, addresses, carts and favorites
+- [x] Managed catalog with availability
+- [x] Order creation with server-calculated prices and retry protection
+- [x] Customer order history and foreground status updates
+- [x] Database access policies and hosted isolation tests
+- [x] Mobile recovery callback configuration
+- [ ] Public email delivery and real-device confirmation/recovery verification
 
 The initial connected checkout is planned for payment on collection/delivery. Online card payments remain a separate integration.
 

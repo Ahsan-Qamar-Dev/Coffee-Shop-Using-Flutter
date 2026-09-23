@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/backend/backend_config.dart';
+
 import '../../../../core/widgets/app_feedback.dart';
 
 import 'package:my_coffee_shop/features/catalog/presentation/pages/home_page.dart';
@@ -63,7 +65,12 @@ class _AuthPageState extends State<AuthPage> {
     }
     if (_reset) {
       setState(() => _resetSent = true);
-      AppFeedback.show(context, 'Preview complete. No reset email was sent.');
+      AppFeedback.show(
+        context,
+        BackendConfig.live
+            ? 'Check your inbox for a password reset link.'
+            : 'Preview complete. No reset email was sent.',
+      );
     } else {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       Get.offAll(() => const HomePage());
@@ -295,7 +302,9 @@ class _AuthPageState extends State<AuthPage> {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 16),
                               child: Text(
-                                'Recovery preview complete. Email delivery will be available when the backend is connected.',
+                                BackendConfig.live
+                                    ? 'If this account exists, a reset link will be sent. Check your inbox and spam folder.'
+                                    : 'Recovery preview complete. Email delivery will be available when the backend is connected.',
                                 style: TextStyle(color: colors.primary),
                               ),
                             ),
@@ -314,9 +323,13 @@ class _AuthPageState extends State<AuthPage> {
                                   )
                                 : Text(
                                     _reset
-                                        ? 'Preview password reset'
+                                        ? (BackendConfig.live
+                                              ? 'Send reset link'
+                                              : 'Preview password reset')
                                         : _signup
-                                        ? 'Create preview account'
+                                        ? (BackendConfig.live
+                                              ? 'Create account'
+                                              : 'Create preview account')
                                         : 'Sign In',
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
@@ -327,10 +340,11 @@ class _AuthPageState extends State<AuthPage> {
                           ),
                           const SizedBox(height: 16),
                           if (widget.mode == AuthPageMode.signIn) ...[
-                            OutlinedButton(
-                              onPressed: auth.busy ? null : _tryDemo,
-                              child: const Text('Try demo account'),
-                            ),
+                            if (!BackendConfig.live)
+                              OutlinedButton(
+                                onPressed: auth.busy ? null : _tryDemo,
+                                child: const Text('Try demo account'),
+                              ),
                             Wrap(
                               alignment: WrapAlignment.center,
                               crossAxisAlignment: WrapCrossAlignment.center,

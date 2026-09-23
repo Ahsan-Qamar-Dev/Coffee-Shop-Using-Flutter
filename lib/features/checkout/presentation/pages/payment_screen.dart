@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/backend/backend_config.dart';
+
 import '../../../../app/shop_navigation.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/shop_widgets.dart';
@@ -267,12 +269,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 )
                               : const Icon(Icons.check),
                           label: Text(
-                            orders.busy ? 'Confirming…' : 'Place preview order',
+                            orders.busy
+                                ? 'Confirming…'
+                                : (BackendConfig.live
+                                      ? 'Place test order'
+                                      : 'Place preview order'),
                           ),
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          'This preview creates a receipt in My orders. It does not send an order to a shop.',
+                          'Private testing only. No coffee will be dispatched and no online payment will be collected.',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 12, height: 1.5),
                         ),

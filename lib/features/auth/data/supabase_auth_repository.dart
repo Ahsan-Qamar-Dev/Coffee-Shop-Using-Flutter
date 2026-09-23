@@ -42,6 +42,7 @@ class SupabaseAuthRepository implements AuthRepository {
           email: email.trim(),
           password: password,
           data: {'name': name.trim()},
+          emailRedirectTo: 'coffeeshop://auth-callback',
         );
         if (response.session == null) {
           throw const AuthFailure(

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/backend/backend_config.dart';
+import '../../../../core/backend/customer_session.dart';
+
 import '../../../../app/shop_navigation.dart';
 import '../../../../app/widgets/custom_drawer.dart';
 import '../../../../core/widgets/shop_widgets.dart';
@@ -83,7 +86,9 @@ class _HomePageState extends State<HomePage> {
           child: MotionTabStack(
             index: navigation.index,
             children: [
-              _catalog(),
+              BackendConfig.live
+                  ? GetBuilder<CustomerSession>(builder: (_) => _catalog())
+                  : _catalog(),
               const FavoriteScreen(embedded: true),
               const CartScreen(embedded: true),
               const NotificationScreen(embedded: true),
@@ -134,8 +139,11 @@ class _HomePageState extends State<HomePage> {
   );
 
   Widget _catalog() {
+    final menu = BackendConfig.live
+        ? Get.find<CustomerSession>().catalog
+        : sampleCoffees;
     final query = _search.text.trim().toLowerCase();
-    final coffees = sampleCoffees
+    final coffees = menu
         .where(
           (coffee) =>
               (_category == 'All' ||
@@ -212,7 +220,7 @@ class _HomePageState extends State<HomePage> {
             filtered ? 'Your selection' : 'Made for your mood',
             subtitle: filtered
                 ? '${coffees.length} ${coffees.length == 1 ? 'coffee' : 'coffees'} found'
-                : '${sampleCoffees.length} coffees, from warm classics to iced favorites.',
+                : '${menu.length} coffees, from warm classics to iced favorites.',
           ),
           if (coffees.isEmpty)
             EmptyState(
@@ -232,7 +240,11 @@ class _HomePageState extends State<HomePage> {
               'A little extra comfort',
               subtitle: 'Slow down with our house favorites.',
             ),
-            Tile2(specials: [sampleCoffees[4], sampleCoffees[1]]),
+            Tile2(
+              specials: menu.length > 4
+                  ? [menu[4], menu[1]]
+                  : menu.take(2).toList(),
+            ),
           ],
         ],
       ),

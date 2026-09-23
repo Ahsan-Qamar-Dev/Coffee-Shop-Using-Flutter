@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/backend/backend_config.dart';
+
 import '../../../../core/widgets/shop_widgets.dart';
 
 class HelpScreen extends StatelessWidget {
@@ -21,14 +23,16 @@ class HelpScreen extends StatelessWidget {
               padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  for (final item in const [
+                  for (final item in [
                     (
                       'How do I order?',
                       'Choose a coffee, select its size and add it to your cart. Checkout lets you review your order, choose pickup or delivery, and select a payment preference.',
                     ),
                     (
                       'Is this a real order?',
-                      'This is a UI preview. Orders and payments are simulated; no coffee is dispatched and no money is charged. Your preview orders are available in My orders during this session.',
+                      BackendConfig.live
+                          ? 'This is a private test app. Orders are saved to your account, but no coffee is dispatched and no money is charged.'
+                          : 'This is a UI preview. Orders and payments are simulated; no coffee is dispatched and no money is charged. Your preview orders are available in My orders during this session.',
                     ),
                     (
                       'Can I change or cancel an order?',
@@ -40,11 +44,13 @@ class HelpScreen extends StatelessWidget {
                     ),
                     (
                       'Where is my data saved?',
-                      'The preview keeps account details, addresses, favorites and orders in memory. Restarting the app clears them. Signing out clears your shopping session. Use test details.',
+                      BackendConfig.live
+                          ? 'Your account, cart, favorites, address and orders are saved to the backend. Wait for syncing before closing the app. Use test details during private testing.'
+                          : 'The preview keeps account details, addresses, favorites and orders in memory. Restarting the app clears them. Signing out clears your shopping session. Use test details.',
                     ),
                     (
                       'How do notifications work?',
-                      'Preview order confirmations appear in Alerts. You can mark them read or clear them. Turn order alerts on or off in Profile & settings. Push delivery will be connected with the backend.',
+                      'Order confirmations appear in Alerts. You can mark them read or clear them. Turn order alerts on or off in Profile & settings. Background push notifications are not enabled.',
                     ),
                   ])
                     ExpansionTile(

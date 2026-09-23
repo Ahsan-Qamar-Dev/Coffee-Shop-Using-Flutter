@@ -12,7 +12,7 @@ Flutter · Dart · GetX · Android & iOS project structure
 
 Coffee Shop is a Flutter portfolio project with an 11-drink menu, warm café styling, dark and light themes, and connected shopping flows. Browse coffees, customize a cup, manage a cart, place a demo order, and export its receipt as a PDF.
 
-> **Project status:** The UI and demo shopping flows are implemented. The current app uses in-memory demo accounts and orders. Supabase/PostgreSQL integration is the next phase; it is **not connected in this version**. No real payment is collected or order sent to a shop.
+> **Project status:** Supabase authentication, saved shopping data, the database catalog and server-priced orders are connected for **private testing**. Public email delivery and on-device backend verification remain pending. No real payment is collected or coffee dispatched. An explicit offline demo mode is also available.
 
 ## Screenshots
 
@@ -49,9 +49,9 @@ Actual app screens captured by Flutter widget previews.
 | Product details | Small/medium/large sizing, updated prices, favorites and add to cart |
 | Cart | Quantity controls, removal with undo, totals and empty states |
 | Checkout | Pickup/delivery selection, address validation, payment preference and order notes |
-| Orders | Demo order history, itemized receipts, cancellation and reorder |
+| Orders | Saved order history, itemized receipts, cancellation, status refresh and reorder |
 | PDF export | Styled receipts, multi-page item tables and Android's native Save PDF picker |
-| Account | Demo sign-in/registration, editable profile, address and password flows |
+| Account | Supabase sign-in/registration, session restoration, saved profile/address/cart/favorites |
 | Navigation | Shared drawer, home/favorites/cart/alerts tabs and contextual cart actions |
 | Appearance | Dark/light themes, responsive layouts, larger-text support and smooth transitions |
 | Motion | Compact animated controls, reduced-motion support and an Android refresh-rate preference up to 120 Hz on supported devices |
@@ -73,9 +73,13 @@ flutter pub get
 flutter run
 ```
 
-No backend keys are required for the current demo. On Windows, enable Developer Mode if Flutter reports that desktop plugin symlinks are unavailable.
+Normal startup connects to Supabase. The bundled key is publishable; database RLS protects customer data. Never place a service-role key in Flutter. See [backend setup](docs/BACKEND_SETUP.md). On Windows, enable Developer Mode if Flutter reports that desktop plugin symlinks are unavailable.
 
 ### Try the demo
+
+```sh
+flutter run --dart-define=DEMO_MODE=true
+```
 
 Choose **Try demo account** on the login screen, or use:
 
@@ -84,13 +88,13 @@ Choose **Try demo account** on the login screen, or use:
 | Email | `demo@coffee.test` |
 | Password | `Coffee123!` |
 
-These are public demo credentials. Use test details for registration: accounts, cart, favorites and order history are session-only and reset when the app restarts. Password recovery is a preview and does not send email.
+These credentials and session-only behavior apply to **offline demo mode**. Connected private testing uses real Supabase accounts and saved shopping data. Use test customer details and the project's authorized team email until custom email delivery is configured.
 
 **Suggested walkthrough:** browse the Iced category → open a drink → select a size → add it to the cart → complete demo checkout → save the receipt PDF → view the order from Alerts.
 
 ## Architecture
 
-The app groups code by feature. GetX controllers hold UI state; repository interfaces separate authentication and ordering from their current demo implementations.
+The app groups code by feature. GetX controllers hold UI state; repository interfaces separate authentication and ordering from Supabase and offline demo implementations.
 
 ```text
 lib/
@@ -111,7 +115,7 @@ lib/
 
 ## Quality checks
 
-The latest recorded UI checkpoint passed **114 automated tests** and **20 light/dark preview captures**, with a clean analyzer and successful Android profile build. Android receipt saving was also checked on a physical phone. These are recorded checks, not a live CI badge.
+The connected backend checkpoint passed **121 automated tests**, local SQL tests and hosted pricing/isolation checks. The earlier UI checkpoint includes **20 light/dark preview captures** and physical Android receipt verification. Backend login and recovery still need phone verification. These are recorded checks, not a live CI badge.
 
 ```sh
 flutter analyze
@@ -131,10 +135,12 @@ Platform folders are present for Android, iOS, web and desktop. **Android is the
 
 ## What's next
 
-- [ ] Supabase authentication and persistent customer data
-- [ ] PostgreSQL catalog and server-validated order pricing
-- [ ] Persistent carts, favorites and order history
-- [ ] Staff order management and live status updates
+- [x] Supabase authentication and persistent customer data
+- [x] PostgreSQL catalog and server-validated order pricing
+- [x] Persistent carts, favorites and order history
+- [x] Foreground status refresh and owner management through Supabase
+- [ ] Public email delivery and on-device backend validation
+- [ ] Dedicated staff app and background push notifications
 - [ ] iOS and wider platform validation
 - [ ] Production payment integration and release preparation
 

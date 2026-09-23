@@ -36,13 +36,15 @@ class AuthController extends GetxController {
   }
 
   Future<bool> signIn(String email, String password) => _run(() async {
-    user = await repository.signIn(email, password);
+    final signedIn = await repository.signIn(email, password);
     await loadSession?.call();
+    user = signedIn;
   });
   Future<bool> signUp(String name, String email, String password) =>
       _run(() async {
-        user = await repository.signUp(name, email, password);
+        final signedUp = await repository.signUp(name, email, password);
         await loadSession?.call();
+        user = signedUp;
       });
   Future<bool> resetPassword(String email) =>
       _run(() => repository.requestPasswordReset(email));

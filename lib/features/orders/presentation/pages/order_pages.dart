@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/backend/backend_config.dart';
+import '../../../../core/backend/customer_session.dart';
+
 import '../../../../app/shop_navigation.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/shop_widgets.dart';
@@ -33,9 +36,11 @@ class OrdersScreen extends StatelessWidget {
                   onAction: () => openShopTab(context, 0),
                 )
               else ...[
-                const SectionTitle(
+                SectionTitle(
                   'Your coffee moments',
-                  subtitle: 'Receipts from this preview session.',
+                  subtitle: BackendConfig.live
+                      ? 'Your saved test orders.'
+                      : 'Receipts from this preview session.',
                 ),
                 for (final order in orders.orders)
                   Padding(
@@ -74,7 +79,9 @@ class OrdersScreen extends StatelessWidget {
                                     label: Text(
                                       order.cancelled
                                           ? 'Cancelled'
-                                          : 'Preview confirmed',
+                                          : (BackendConfig.live
+                                                ? order.status
+                                                : 'Preview confirmed'),
                                     ),
                                   ),
                                 ],
@@ -169,7 +176,9 @@ class OrderDetailScreen extends StatelessWidget {
                             ? 'Order cancelled'
                             : justPlaced
                             ? 'A good choice, brewed for you.'
-                            : 'Preview order confirmed',
+                            : (BackendConfig.live
+                                  ? 'Order ${order.status}'
+                                  : 'Preview order confirmed'),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontFamily: 'Poppins',
@@ -184,8 +193,10 @@ class OrderDetailScreen extends StatelessWidget {
                         style: const TextStyle(height: 1.6),
                       ),
                       const SizedBox(height: 14),
-                      const Text(
-                        'Preview only · No payment was taken and no order was sent to a shop.',
+                      Text(
+                        BackendConfig.live
+                            ? 'Saved for private testing · No payment or coffee dispatch.'
+                            : 'Preview only · No payment was taken and no order was sent to a shop.',
                         textAlign: TextAlign.center,
                         style: TextStyle(height: 1.5),
                       ),
@@ -245,8 +256,14 @@ class OrderDetailScreen extends StatelessWidget {
                   onPressed: () {
                     final cart = Get.find<CartController>();
                     for (final line in draft.lines) {
+                      final matches = BackendConfig.live
+                          ? Get.find<CustomerSession>().catalog.where(
+                              (c) => c.id == line.coffee.id,
+                            )
+                          : [line.coffee];
+                      if (matches.isEmpty) continue;
                       for (var i = 0; i < line.quantity; i++) {
-                        cart.addItem(line.coffee, line.size);
+                        cart.addItem(matches.first, line.size);
                       }
                     }
                     openShopTab(context, 2);
@@ -262,14 +279,17 @@ class OrderDetailScreen extends StatelessWidget {
                   onPressed: () => openShopTab(context, 0),
                   child: const Text('Continue shopping'),
                 ),
-                if (!order.cancelled)
+                if (!order.cancelled &&
+                    (!BackendConfig.live || order.status == 'confirmed'))
                   TextButton(
                     onPressed: orders.busy
                         ? null
                         : () async {
                             if (!await confirmAction(
                               context,
-                              title: 'Cancel this preview order?',
+                              title: BackendConfig.live
+                                  ? 'Cancel this order?'
+                                  : 'Cancel this preview order?',
                               message: 'The receipt will stay in your order history.',
                               action: 'Cancel order',
                             )) {
@@ -279,12 +299,20 @@ class OrderDetailScreen extends StatelessWidget {
                             if (!context.mounted) return;
                             AppFeedback.show(
                               context,
-                              ok ? 'Preview order cancelled' : orders.error!,
+                              ok
+                                  ? (BackendConfig.live
+                                        ? 'Order cancelled'
+                                        : 'Preview order cancelled')
+                                  : orders.error!,
                               error: !ok,
                             );
                           },
                     child: Text(
-                      orders.busy ? 'Cancelling…' : 'Cancel preview order',
+                      orders.busy
+                          ? 'Cancelling…'
+                          : (BackendConfig.live
+                                ? 'Cancel order'
+                                : 'Cancel preview order'),
                     ),
                   ),
               ],

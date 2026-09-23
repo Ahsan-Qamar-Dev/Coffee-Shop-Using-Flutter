@@ -1,7 +1,14 @@
 # Backend checkpoint — 23 September 2026
 
-Status: tested local foundation, NOT a deployed or connected backend.
-The application still starts in demo mode. No cloud migrations have been applied.
+Status: database deployed; Flutter is connected for private testing.
+Normal startup initializes Supabase; `--dart-define=DEMO_MODE=true` selects the
+offline demo. Both SQL migrations were applied via
+the Supabase SQL Editor to project `sxduvqxceyawunjonqaj` on 23 September 2026.
+Hosted verification returned `coffees: 11`, `customer_state: 0`, `orders: 0`,
+with row-level security enabled on all three tables. Hosted transactional tests
+passed pricing, deduplication, cancellation and two-account isolation; synthetic
+users/orders/state were rolled back. Real phone login is still pending.
+Do not reapply the initial schema migration.
 The user's requirement is a free service without subscriptions or billing setup.
 
 ## Prepared
@@ -13,16 +20,27 @@ The user's requirement is a free service without subscriptions or billing setup.
   checkout rate limit and ownership-checked cancellation.
 - Eleven-product seed generated from the existing Flutter catalog. Reapplying
   the seed preserves merchant edits. Photos remain bundled in the app.
-- Controller integration hooks and order snapshot decoding, including server fees.
+- Session restore, live catalog, serialized saves, sync retry banner, logout flush,
+  cart/favorites/profile/address and notification read/dismiss persistence.
+- Foreground order refresh every 30 seconds, stopped in background.
+- Pending checkout UUID/hash persists across process restarts.
+- Android/iOS deep links, recovery-password screen, cash-only private checkout.
+- Callback `coffeeshop://auth-callback` saved after explicit user approval.
 
 ## Validation
 
-- 117 Flutter tests passed, including three new backend codec tests.
+- 121 Flutter tests passed, including backend codec and session/retry tests.
 - Flutter static analysis: no issues found.
+- Android profile APK built successfully after disabling Kotlin incremental
+  caches for the Windows C:/D: plugin-cache layout. APK:
+  `build/app/outputs/flutter-apk/app-profile.apk` (120.8 MB).
 - 21 PostgreSQL checks passed in disposable PGlite: correct totals, tampered
   prices, invalid quantities, missing delivery address, duplicate requests,
   customer isolation, forbidden direct writes, cancellation and anonymous access.
-- These are local checks, not verification of the hosted Supabase configuration.
+- The app's public key
+  reaches hosted Auth, and anonymous REST reads are denied for all three tables.
+- Hosted authenticated-role tests passed as described above; these do not replace
+  real email, phone and app relaunch verification.
 
 Reproduce from the repository root:
 
@@ -37,22 +55,14 @@ node tool/test_backend.mjs
 
 ## Next steps, in order
 
-1. Implement versioned customer state serialization and session synchronization:
-   cart, favorites, profile/address, notifications; debounced writes, retry UI,
-   account isolation and safe logout. Hooks currently have no callbacks attached.
-2. Connect app startup/bindings, load the live catalog instead of sample data,
-   restore auth sessions and fetch order history. Keep demo mode explicit.
-3. Configure confirmation/reset links and mobile deep links. Resolve production
-   email delivery on a free option; do not silently disable verification.
-4. Replace preview-only messaging and hide demo-card checkout in live mode.
-   Add recoverable loading/offline/error states and refresh server order status.
-5. Persist pending order request IDs across process restarts. Current retry
-   deduplication survives network retries in memory, but not app restarts.
-6. Review and apply both migrations to project `sxduvqxceyawunjonqaj`, then verify
-   hosted grants/RLS and two-account isolation. The public client key is already
-   in BackendConfig; never put a service-role key or database password in Flutter.
-7. Run real account, checkout, cancellation, relaunch and receipt tests on phone.
-   A store/admin workflow is still needed to move orders through preparation.
+1. Reconnect the phone: ADB currently shows no device. Install the connected APK.
+2. Register with the project's team email and privately entered password; verify
+   confirmation, relaunch persistence, checkout, cancellation, recovery and PDF.
+3. Public email delivery is intentionally deferred: the user chose private testing.
+   Keep email confirmation enabled; do not activate billing or subscriptions.
+4. Owners manage test orders in Supabase Table Editor (BACKEND_SETUP.md). Dedicated
+   staff UI, background push, real store details, payments and production release
+   preparation remain future work.
 
 Preserve the current README/gallery/repository presentation. The earlier staging
 copy has older documentation; do not copy its entire docs directory over the repo.

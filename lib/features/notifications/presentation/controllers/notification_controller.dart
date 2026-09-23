@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../../../../core/backend/backend_config.dart';
+
 class ShopNotification {
   ShopNotification({
     required this.id,
@@ -24,7 +26,9 @@ class NotificationController extends GetxController {
       0,
       ShopNotification(
         id: orderId,
-        title: 'Your preview order is confirmed',
+        title: BackendConfig.live
+            ? 'Your test order is confirmed'
+            : 'Your preview order is confirmed',
         body: 'Open your order to see the receipt and collection or delivery details.',
         createdAt: createdAt ?? DateTime.now(),
         orderId: orderId,

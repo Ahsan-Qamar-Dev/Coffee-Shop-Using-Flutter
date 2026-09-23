@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
 
 import '../../profile/domain/customer_preferences.dart';
 import '../../../../core/backend/backend_codec.dart';
@@ -54,15 +56,35 @@ class SupabaseOrderRepository implements OrderRepository {
       'p_note': draft.note,
       'p_expected_total': draft.totalCents,
     };
-    final fingerprint = '${client.auth.currentUser?.id}:${jsonEncode(params)}';
+    final owner = client.auth.currentUser?.id;
+    if (owner == null) throw const OrderFailure('Please sign in again.');
+    final preferences = await SharedPreferences.getInstance();
+    final key = 'pending_order_$owner';
+    final fingerprint = sha256
+        .convert(utf8.encode(jsonEncode(params)))
+        .toString();
+    final saved = preferences.getString(key);
+    if (_fingerprint == null && saved != null) {
+      final pending = jsonDecode(saved) as Map;
+      _fingerprint = pending['fingerprint'] as String;
+      _requestId = pending['request_id'] as String;
+    }
     if (_fingerprint != fingerprint) {
       _fingerprint = fingerprint;
       _requestId = _uuid();
+    }
+    // Save before sending: a process restart can retry the same request safely.
+    if (!await preferences.setString(
+      key,
+      jsonEncode({'fingerprint': _fingerprint, 'request_id': _requestId}),
+    )) {
+      throw const OrderFailure('Could not save your checkout. Please retry.');
     }
     params['p_request_id'] = _requestId;
     try {
       final row = await client.rpc('place_order', params: params);
       final order = orderFromRow(Map<String, dynamic>.from(row as Map));
+      await preferences.remove(key);
       resetRequest();
       return order;
     } on PostgrestException catch (e) {
