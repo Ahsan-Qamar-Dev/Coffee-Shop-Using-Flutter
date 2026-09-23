@@ -1,0 +1,30 @@
+name: Bug report
+description: Report a reproducible problem in Coffee Shop
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the actual behavior and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open the app\n2. Navigate to...\n3. Tap..."
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Device, OS and Flutter version
+      placeholder: Android phone, OS version, flutter --version
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or sanitized logs
+      description: Remove personal information, passwords and tokens before attaching anything.

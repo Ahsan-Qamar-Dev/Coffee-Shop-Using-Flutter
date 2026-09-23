@@ -1,0 +1,17 @@
+name: Feature request
+description: Suggest an improvement to Coffee Shop
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What user problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include affected screens and any alternatives you considered.
+    validations:
+      required: true

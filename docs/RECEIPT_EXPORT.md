@@ -8,4 +8,4 @@ The receipt uses a table that spans pages and repeats its headings, with totals 
 
 Reference: https://developer.android.com/training/data-storage/shared/documents-files#create-file
 
-The original phone error could not be reproduced while the phone was disconnected. Do not describe its exact cause as confirmed. Native build and on-device save verification are separate checks.
+The rebuilt Android export flow was subsequently verified on the owner's phone. The original failure was not captured in device logs, so its exact cause remains unconfirmed. Changes to the native save channel require a full rebuild and installation.
