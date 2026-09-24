@@ -21,6 +21,23 @@ class NotificationController extends GetxController {
   final List<ShopNotification> _items = [];
   List<ShopNotification> get items => List.unmodifiable(_items);
   int get unreadCount => _items.where((item) => !item.read).length;
+  void addStatus(String orderId, String status) {
+    _items.removeWhere((item) => item.orderId == orderId);
+    _items.insert(
+      0,
+      ShopNotification(
+        id: orderId,
+        title: 'Your order is $status',
+        body: 'Open your order for the latest details.',
+        createdAt: DateTime.now(),
+        orderId: orderId,
+      ),
+    );
+    if (_items.length > 200) _items.removeRange(200, _items.length);
+    update();
+    onChanged?.call();
+  }
+
   void addOrder(String orderId, {DateTime? createdAt}) {
     _items.insert(
       0,

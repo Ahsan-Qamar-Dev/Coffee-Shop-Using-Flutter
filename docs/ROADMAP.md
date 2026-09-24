@@ -23,16 +23,22 @@ Supabase with PostgreSQL is connected by default. The original demo remains avai
 - [x] Customer order history and foreground status updates
 - [x] Database access policies and hosted isolation tests
 - [x] Mobile recovery callback configuration
+- [x] Role-protected staff order dashboard and status workflow
+- [x] Owner menu editing, availability and staff access management
+- [x] Offline staff/owner dashboard demonstration
 - [ ] Public email delivery and real-device confirmation/recovery verification
 
 The initial connected checkout is planned for payment on collection/delivery. Online card payments remain a separate integration.
 
 ## Before production
 
-- [ ] Staff workflow for accepting, preparing and completing orders
+- [ ] Assign the buyer's confirmed owner account and verify the staff flow on devices
 - [ ] Real store details, prices, delivery rules and operating hours
 - [ ] Network failure, recovery and account lifecycle checks
 - [ ] iOS device testing and platform-specific export validation
 - [ ] Release signing, privacy documentation and distribution setup
 
 Free hosting has quotas and operational limits. No paid subscription is part of the planned initial backend setup.
+
+See [resale readiness](RESALE_READINESS.md) for free provider options and the
+remaining business setup. A subscription upgrade alone is not a production launch.

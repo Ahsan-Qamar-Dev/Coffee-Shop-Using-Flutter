@@ -23,6 +23,8 @@ class CustomerSession extends GetxController with WidgetsBindingObserver {
   final SupabaseOrderRepository orders;
   List<Coffee> catalog = [];
   String? error;
+  String? orderRefreshError;
+  bool isStaff = false;
   String? _owner;
   bool _hydrating = false, _dirty = false, _refreshing = false;
   Timer? _timer, _poll;
@@ -57,11 +59,13 @@ class CustomerSession extends GetxController with WidgetsBindingObserver {
     final products = await data.loadCatalog();
     final state = await data.loadState();
     final history = await orders.load();
+    final staff = await data.isStaff();
     if (client.auth.currentUser?.id != owner) return;
     clear();
     _hydrating = true;
     try {
       catalog = products;
+      isStaff = staff;
       final byId = {for (final c in products) c.id: c};
       for (final row in (state['cart'] as List? ?? [])) {
         final coffee = byId[row['id']];
@@ -176,13 +180,61 @@ class CustomerSession extends GetxController with WidgetsBindingObserver {
     try {
       final history = await orders.load();
       if (_owner == owner && !Get.find<OrderController>().busy) {
+        final oldStatuses = {
+          for (final order in Get.find<OrderController>().orders)
+            order.id: order.status,
+        };
         Get.find<OrderController>().restore(history);
+        if (profile.orderAlerts) {
+          for (final order in history) {
+            if (oldStatuses[order.id] != order.status) {
+              notifications.addStatus(order.id, order.status);
+            }
+          }
+        }
+        orderRefreshError = null;
       }
     } catch (_) {
-      /* Foreground retry and the next poll recover transient errors. */
+      if (_owner == owner) {
+        orderRefreshError =
+            'Could not refresh orders. Check your connection and retry.';
+      }
     } finally {
       _refreshing = false;
+      update();
     }
+  }
+
+  Future<void> refreshCatalog() async {
+    final owner = _owner;
+    if (owner == null) return;
+    final products = await data.loadCatalog();
+    if (_owner != owner) return;
+    final items = cart.items;
+    final saved = favorites.favorites;
+    final byId = {for (final coffee in products) coffee.id: coffee};
+    _hydrating = true;
+    try {
+      catalog = products;
+      cart.clearCart();
+      for (final item in items) {
+        final coffee = byId[item.coffee.id];
+        if (coffee != null) {
+          cart.restoreItem(
+            CartItem(coffee: coffee, size: item.size, quantity: item.quantity),
+          );
+        }
+      }
+      favorites.clear();
+      for (final old in saved) {
+        final coffee = byId[old.id];
+        if (coffee != null) favorites.toggleFavorite(coffee);
+      }
+    } finally {
+      _hydrating = false;
+    }
+    changed();
+    update();
   }
 
   @override
@@ -211,6 +263,8 @@ class CustomerSession extends GetxController with WidgetsBindingObserver {
     notifications.clear();
     Get.find<OrderController>().clear();
     catalog = [];
+    isStaff = false;
+    orderRefreshError = null;
     error = null;
     _hydrating = false;
     update();

@@ -1,4 +1,33 @@
-# Backend checkpoint — 23 September 2026
+# Backend checkpoint — 24 September 2026
+
+The staff and owner migrations (202609230003 and 202609240004) were deployed to
+`sxduvqxceyawunjonqaj`. Hosted permission checks confirm staff-table RLS, denied client role inserts and
+denied anonymous dashboard access. Hosted SQL verification returned `owner_menu()`,
+`staff_orders()` and **0 granted accounts**. No owner was assigned: the user is
+exploring personally and may sell the app later.
+
+- Staff dashboard: recent orders, active/completed summaries, delivery details,
+  validated fulfilment/cancellation, manual and foreground automatic refresh.
+- Owner tools: edit existing products/prices/availability and manage confirmed
+  staff accounts. Customer accounts cannot grant roles or write menu prices.
+- Offline dashboard demo works without a live owner account.
+- Both offline demo and connected Android profile APKs built successfully. The
+  offline demo APK was installed on the connected phone (ADB reported Success).
+  Installation does not replace hands-on workflow verification.
+- Customer status changes create in-app alerts; menu refresh updates cart prices
+  and removes unavailable items from cart/favorites.
+- 125 Flutter tests passed (124-suite run plus the added menu-refresh regression); static analysis passed with no issues.
+- 38 local PostgreSQL checks passed, including staff/owner permissions, forbidden
+  self-grants, transitions, price validation, staff grant/revoke and owner protection.
+- Hosted verification confirms installation; the new role workflow still needs
+  end-to-end validation with actual signed-in accounts and a phone.
+
+See [setup](BACKEND_SETUP.md) for dashboard access and first-owner assignment,
+and [resale readiness](RESALE_READINESS.md) for free services and remaining work.
+Public email and background push are not connected. No billing was enabled.
+
+## Previous connected checkpoint — 23 September 2026
+
 
 Status: database deployed; Flutter is connected for private testing.
 Normal startup initializes Supabase; `--dart-define=DEMO_MODE=true` selects the
@@ -60,9 +89,9 @@ node tool/test_backend.mjs
    confirmation, relaunch persistence, checkout, cancellation, recovery and PDF.
 3. Public email delivery is intentionally deferred: the user chose private testing.
    Keep email confirmation enabled; do not activate billing or subscriptions.
-4. Owners manage test orders in Supabase Table Editor (BACKEND_SETUP.md). Dedicated
-   staff UI, background push, real store details, payments and production release
-   preparation remain future work.
+4. Staff and owner screens were added on 24 September (see above). Background
+   push, real store configuration and production release preparation remain.
+   Online payments are intentionally excluded.
 
 Preserve the current README/gallery/repository presentation. The earlier staging
 copy has older documentation; do not copy its entire docs directory over the repo.

@@ -19,7 +19,27 @@ class OrdersScreen extends StatelessWidget {
   const OrdersScreen({super.key});
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('My orders')),
+    appBar: AppBar(
+      title: const Text('My orders'),
+      actions: [
+        if (BackendConfig.live)
+          IconButton(
+            tooltip: 'Refresh orders',
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              final session = Get.find<CustomerSession>();
+              await session.refreshOrders();
+              if (context.mounted && session.orderRefreshError != null) {
+                AppFeedback.show(
+                  context,
+                  session.orderRefreshError!,
+                  error: true,
+                );
+              }
+            },
+          ),
+      ],
+    ),
     body: SafeArea(
       child: PageBody(
         maxWidth: 760,

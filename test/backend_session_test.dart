@@ -42,8 +42,9 @@ class MemoryData extends SupabaseCustomerRepository {
   int writes = 0;
   bool fail = false;
   Completer<void>? held;
+  List<Coffee> catalog = sampleCoffees;
   @override
-  Future<List<Coffee>> loadCatalog() async => sampleCoffees;
+  Future<List<Coffee>> loadCatalog() async => catalog;
   @override
   Future<Map<String, dynamic>> loadState() async => state;
   @override
@@ -109,6 +110,39 @@ void main() {
     await session.flush();
     expect(data.writes, 0);
     expect(Get.find<CartController>().items, isEmpty);
+  });
+  test('menu refresh reprices cart and removes unavailable products', () async {
+    final data = MemoryData(client);
+    final session = Get.put(
+      CustomerSession(client, data, MemoryOrders(client)),
+    );
+    await session.load();
+    final cart = Get.find<CartController>();
+    final favorites = Get.find<FavoriteController>();
+    final original = sampleCoffees.first;
+    cart.addItem(original, 'M');
+    cart.addItem(sampleCoffees[1], 'S');
+    favorites.toggleFavorite(original);
+    favorites.toggleFavorite(sampleCoffees[1]);
+    data.catalog = [
+      Coffee(
+        id: original.id,
+        name: original.name,
+        subtitle: original.subtitle,
+        description: original.description,
+        price: 6,
+        rating: original.rating,
+        imagePath: original.imagePath,
+        category: original.category,
+        containsMilk: original.containsMilk,
+      ),
+    ];
+    await session.refreshCatalog();
+    expect(cart.items.single.coffee.id, original.id);
+    expect(cart.totalCents, 650);
+    expect(favorites.favorites.single.price, 6);
+    await session.flush();
+    expect((data.state['cart'] as List).length, 1);
   });
   test('failed writes keep dirty changes and recover on retry', () async {
     final data = MemoryData(client);

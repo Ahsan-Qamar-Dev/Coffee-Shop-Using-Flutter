@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../core/backend/backend_config.dart';
+import '../../core/backend/customer_session.dart';
+import '../../features/orders/presentation/pages/staff_orders_screen.dart';
+
 import '../sign_out.dart';
 import '../../core/theme/theme_controller.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
@@ -81,6 +85,22 @@ class CustomDrawer extends StatelessWidget {
             title: const Text('Profile & settings'),
             onTap: () => _open(context, const ProfileScreen()),
           ),
+          if (BackendConfig.live)
+            GetBuilder<CustomerSession>(
+              builder: (session) => session.isStaff
+                  ? ListTile(
+                      leading: const Icon(Icons.storefront_outlined),
+                      title: const Text('Store orders'),
+                      onTap: () => _open(context, const StaffOrdersScreen()),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          if (!BackendConfig.live)
+            ListTile(
+              leading: const Icon(Icons.storefront_outlined),
+              title: const Text('Demo store dashboard'),
+              onTap: () => _open(context, const StaffOrdersScreen()),
+            ),
           ListTile(
             leading: const Icon(Icons.help_outline),
             title: const Text('Help & about'),

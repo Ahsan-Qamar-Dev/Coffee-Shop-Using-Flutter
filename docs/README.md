@@ -5,6 +5,7 @@ Start with the [main README](../README.md) for screenshots, features and setup.
 | Document | Purpose |
 | --- | --- |
 | [Roadmap](ROADMAP.md) | Current implementation and remaining work |
+| [Resale readiness](RESALE_READINESS.md) | Free services, buyer handoff and remaining production setup |
 | [Backend setup](BACKEND_SETUP.md) | Connected/private mode, configuration and owner order workflow |
 | [Backend checkpoint](BACKEND_CHECKPOINT.md) | Deployment, verification and next device checks |
 | [UI phase](UI_PHASE.md) | UI architecture and connected flows |

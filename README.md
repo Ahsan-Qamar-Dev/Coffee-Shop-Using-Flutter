@@ -50,6 +50,7 @@ Actual app screens captured by Flutter widget previews.
 | Cart | Quantity controls, removal with undo, totals and empty states |
 | Checkout | Pickup/delivery selection, address validation, payment preference and order notes |
 | Orders | Saved order history, itemized receipts, cancellation, status refresh and reorder |
+| Staff & owner | Role-protected order dashboard, fulfilment actions, menu prices/availability and staff management |
 | PDF export | Styled receipts, multi-page item tables and Android's native Save PDF picker |
 | Account | Supabase sign-in/registration, session restoration, saved profile/address/cart/favorites |
 | Navigation | Shared drawer, home/favorites/cart/alerts tabs and contextual cart actions |
@@ -90,6 +91,8 @@ Choose **Try demo account** on the login screen, or use:
 
 These credentials and session-only behavior apply to **offline demo mode**. Connected private testing uses real Supabase accounts and saved shopping data. Use test customer details and the project's authorized team email until custom email delivery is configured.
 
+For the shop side, place an offline demo order, then open **Demo store dashboard** in the drawer. Use the gear icon for Owner tools. Live access requires an assigned, confirmed owner/staff account; no owner is preassigned. See [free services and buyer handoff](docs/RESALE_READINESS.md).
+
 **Suggested walkthrough:** browse the Iced category → open a drink → select a size → add it to the cart → complete demo checkout → save the receipt PDF → view the order from Alerts.
 
 ## Architecture
@@ -115,7 +118,7 @@ lib/
 
 ## Quality checks
 
-The connected backend checkpoint passed **121 automated tests**, local SQL tests and hosted pricing/isolation checks. The earlier UI checkpoint includes **20 light/dark preview captures** and physical Android receipt verification. Backend login and recovery still need phone verification. These are recorded checks, not a live CI badge.
+The connected backend checkpoint passed **125 automated tests**, local SQL tests and hosted pricing/isolation checks. The earlier UI checkpoint includes **20 light/dark preview captures** and physical Android receipt verification. Backend login and recovery still need phone verification. These are recorded checks, not a live CI badge.
 
 ```sh
 flutter analyze
@@ -138,11 +141,12 @@ Platform folders are present for Android, iOS, web and desktop. **Android is the
 - [x] Supabase authentication and persistent customer data
 - [x] PostgreSQL catalog and server-validated order pricing
 - [x] Persistent carts, favorites and order history
-- [x] Foreground status refresh and owner management through Supabase
+- [x] Foreground status refresh and role-protected staff/owner dashboard
 - [ ] Public email delivery and on-device backend validation
-- [ ] Dedicated staff app and background push notifications
+- [x] Owner menu editing, availability and staff access management
+- [ ] Background push notifications and buyer-specific store configuration
 - [ ] iOS and wider platform validation
-- [ ] Production payment integration and release preparation
+- [ ] Production release preparation (online payments intentionally excluded)
 
 See the [roadmap](docs/ROADMAP.md) for current boundaries and the [documentation index](docs/README.md) for implementation notes.
 

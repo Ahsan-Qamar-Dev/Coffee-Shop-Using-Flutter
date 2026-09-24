@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/backend/backend_config.dart';
 import '../../../../core/backend/customer_session.dart';
+import '../../../../core/widgets/app_feedback.dart';
 
 import '../../../../app/shop_navigation.dart';
 import '../../../../app/widgets/custom_drawer.dart';
@@ -70,6 +71,30 @@ class _HomePageState extends State<HomePage> {
           ),
           title: Text(_titles[navigation.index]),
           actions: [
+            if (BackendConfig.live)
+              IconButton(
+                tooltip: 'Refresh menu',
+                icon: const Icon(Icons.refresh),
+                onPressed: () async {
+                  try {
+                    await Get.find<CustomerSession>().refreshCatalog();
+                    if (context.mounted) {
+                      AppFeedback.show(
+                        context,
+                        'Menu updated. Your cart now uses current prices and availability.',
+                      );
+                    }
+                  } catch (_) {
+                    if (context.mounted) {
+                      AppFeedback.show(
+                        context,
+                        'Could not refresh the menu. Please retry.',
+                        error: true,
+                      );
+                    }
+                  }
+                },
+              ),
             IconButton(
               tooltip: 'Profile & settings',
               onPressed: () => Navigator.push(
